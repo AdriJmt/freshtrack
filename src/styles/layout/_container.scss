@@ -1,0 +1,8 @@
+@use "../abstracts" as vars;
+
+.container {
+  width: 100%;
+  max-width: vars.$container-max-width;
+  margin-inline: auto;
+  padding-inline: vars.$spacing-md;
+}

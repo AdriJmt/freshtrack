@@ -1,0 +1,27 @@
+<aside class="brand-panel">
+    <app-brand-logo variant="light" />
+
+    <div class="brand-panel__content">
+        <h1>{{ content.title }}</h1>
+
+        <p class="brand-panel__description">
+            {{ content.description }}
+        </p>
+
+        <ul class="brand-panel__features">
+            @for (feature of content.features; track feature) {
+            <li>
+                <span class="brand-panel__feature-icon" aria-hidden="true">
+                    ✓
+                </span>
+                {{ feature }}
+            </li>
+            }
+        </ul>
+    </div>
+
+    <footer class="brand-panel__footer">
+        <span>© 2026 FreshTrack</span>
+        <a routerLink="/confidentialite">Confidentialité</a>
+    </footer>
+</aside>

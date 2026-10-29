@@ -1,0 +1,51 @@
+@use "../abstracts" as vars;
+
+.auth-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 100dvh;
+  background: vars.$color-surface;
+  color: vars.$color-text;
+}
+
+.auth-layout__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 52px clamp(28px, 5vw, 76px);
+  background: vars.$color-background;
+}
+
+@media (max-width: vars.$breakpoint-tablet) {
+  .auth-layout {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+
+  .auth-layout__content {
+    padding: 40px 30px;
+  }
+}
+
+@media (max-width: vars.$breakpoint-mobile) {
+  .auth-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    background: vars.$color-background;
+  }
+
+  .auth-layout__content {
+    flex: 1;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 30px 24px 36px;
+  }
+}
+
+@media (max-width: 380px) {
+  .auth-layout__content {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+}

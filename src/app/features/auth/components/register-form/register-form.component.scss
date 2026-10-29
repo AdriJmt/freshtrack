@@ -1,0 +1,190 @@
+@use "styles/abstracts" as vars;
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 460px;
+}
+
+.register-form {
+  width: 100%;
+
+  &__mobile-brand {
+    display: none;
+  }
+
+  &__heading {
+    margin-bottom: 34px;
+
+    h2 {
+      margin: 12px 0 10px;
+      color: vars.$color-text;
+      font-size: clamp(27px, 2.5vw, 35px);
+      font-weight: 650;
+      line-height: 1.2;
+      letter-spacing: -1.2px;
+    }
+
+    p {
+      margin: 0;
+      color: vars.$color-text-muted;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+  }
+
+  &__eyebrow {
+    color: vars.$color-primary;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 1.5px;
+  }
+
+  form {
+    display: grid;
+    gap: 23px;
+  }
+
+  &__field {
+    display: grid;
+    gap: 9px;
+    min-width: 0;
+
+    > label {
+      color: vars.$color-text;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    > input,
+    app-password-field {
+      display: block;
+      width: 100%;
+      min-width: 0;
+    }
+
+    > input {
+      box-sizing: border-box;
+      height: 54px;
+      padding: 0 15px;
+      border: 1px solid vars.$color-border;
+      border-radius: vars.$radius-md;
+      outline: none;
+      background: vars.$color-surface;
+      color: vars.$color-text;
+      font: inherit;
+      font-size: 14px;
+      transition:
+        border-color 160ms,
+        box-shadow 160ms;
+
+      &::placeholder {
+        color: #a2a7a1;
+      }
+
+      &:focus {
+        border-color: vars.$color-primary;
+        box-shadow: 0 0 0 3px rgb(40 91 69 / 10%);
+      }
+    }
+  }
+
+  &__hint {
+    color: vars.$color-text-muted;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  &__message {
+    margin: -4px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+
+    &--error {
+      color: vars.$color-danger;
+    }
+
+    &--success {
+      color: vars.$color-primary;
+    }
+  }
+
+  .button--primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 54px;
+    margin-top: 2px;
+    padding: 14px 20px;
+    border: 0;
+    border-radius: vars.$radius-md;
+    background: vars.$color-primary;
+    color: vars.$color-surface;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 650;
+    cursor: pointer;
+    transition:
+      background 160ms,
+      transform 160ms;
+
+    &:not(:disabled):hover {
+      background: vars.$color-primary-dark;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
+
+  &__login {
+    margin: 30px 0 0;
+    color: vars.$color-text-muted;
+    font-size: 13px;
+    line-height: 1.7;
+    text-align: center;
+
+    a {
+      color: vars.$color-primary;
+      font-weight: 650;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+@media (max-width: vars.$breakpoint-mobile) {
+  .register-form {
+    &__mobile-brand {
+      display: inline-flex;
+      margin-bottom: 45px;
+    }
+
+    &__heading {
+      margin-bottom: 29px;
+
+      h2 {
+        font-size: 30px;
+      }
+    }
+  }
+}
+
+@media (max-width: 380px) {
+  .register-form {
+    &__mobile-brand {
+      margin-bottom: 34px;
+    }
+
+    &__heading h2 {
+      font-size: 27px;
+    }
+  }
+}

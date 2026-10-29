@@ -1,0 +1,58 @@
+@use "styles/abstracts" as vars;
+
+:host {
+  display: inline-flex;
+  align-self: flex-start;
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: vars.$color-primary;
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.8px;
+  text-decoration: none;
+
+  &__icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    place-items: center;
+    border-radius: 13px;
+    color: vars.$color-primary;
+    background: vars.$color-surface;
+
+    svg {
+      width: 29px;
+      height: 29px;
+    }
+  }
+
+  &__name {
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+  }
+
+  &--light {
+    color: vars.$color-surface;
+
+    .brand-logo__icon {
+      color: vars.$color-primary;
+      background: vars.$color-surface;
+    }
+
+    &:focus-visible {
+      outline-color: #91b69b;
+    }
+  }
+
+  &:focus-visible {
+    border-radius: vars.$radius-sm;
+    outline: 3px solid #91b69b;
+    outline-offset: 4px;
+  }
+}

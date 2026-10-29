@@ -1,0 +1,64 @@
+<div class="register-form">
+    <app-brand-logo class="register-form__mobile-brand" />
+
+    <div class="register-form__heading">
+        <span class="register-form__eyebrow">CRÉER UN COMPTE</span>
+
+        <h2>Rejoignez FreshTrack.</h2>
+
+        <p>
+            Créez votre espace pour suivre vos aliments et réduire le gaspillage.
+        </p>
+    </div>
+
+    <form #registerForm="ngForm" (ngSubmit)="onSubmit()">
+        <div class="register-form__field">
+            <label for="register-email">Adresse e-mail</label>
+
+            <input id="register-email" type="email" name="email" [(ngModel)]="email" placeholder="vous@exemple.fr"
+                autocomplete="email" required email />
+        </div>
+
+        <div class="register-form__field">
+            <label for="register-password">Mot de passe</label>
+
+            <app-password-field name="password" [(ngModel)]="password" autocomplete="new-password"
+                placeholder="Choisissez un mot de passe" required />
+
+            <span class="register-form__hint">
+                Choisissez un mot de passe suffisamment robuste.
+            </span>
+        </div>
+
+        <div class="register-form__field">
+            <label for="register-confirm-password">
+                Confirmer le mot de passe
+            </label>
+
+            <app-password-field name="confirmPassword" [(ngModel)]="confirmPassword" autocomplete="new-password"
+                placeholder="Saisissez à nouveau le mot de passe" required />
+        </div>
+
+        @if (errorMessage) {
+        <p class="register-form__message register-form__message--error" role="alert">
+            {{ errorMessage }}
+        </p>
+        }
+
+        @if (successMessage) {
+        <output class="register-form__message register-form__message--success">
+            {{ successMessage }}
+        </output>
+        }
+
+        <button class="button button--primary" type="submit"
+            [disabled]="registerForm.invalid || isSubmitting || password !== confirmPassword">
+            {{ isSubmitting ? 'Création du compte…' : 'Créer mon compte' }}
+        </button>
+    </form>
+
+    <p class="register-form__login">
+        Vous avez déjà un compte ?
+        <a routerLink="/connexion">Se connecter</a>
+    </p>
+</div>

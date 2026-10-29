@@ -1,0 +1,29 @@
+@use "../abstracts" as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  min-height: 52px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: $radius-md;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+
+  &--primary {
+    background: $color-primary;
+    color: $color-surface;
+
+    &:hover:not(:disabled) {
+      background: $color-primary-dark;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
+}
