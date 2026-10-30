@@ -1,0 +1,86 @@
+@use "styles/abstracts/variables" as vars;
+
+.storages-page {
+  width: 100%;
+
+  &__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: vars.$spacing-xl;
+    margin-bottom: vars.$spacing-xl;
+  }
+
+  h1 {
+    margin: vars.$spacing-sm 0;
+    color: vars.$color-text;
+    font-size: vars.$font-size-xl;
+  }
+
+  p {
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-base;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: vars.$spacing-sm;
+  }
+
+  &__add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: vars.$spacing-sm;
+    min-height: 38px;
+    padding: vars.$spacing-sm vars.$spacing-md;
+    border: 1px solid transparent;
+    border-radius: vars.$radius-md;
+    font-family: vars.$font-family-base;
+    font-size: vars.$font-size-sm;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 180ms ease;
+
+    span {
+      font-size: vars.$font-size-base;
+      line-height: 1;
+    }
+
+    &--fridge {
+      background: vars.$color-storage-fridge;
+      color: vars.$color-storage-fridge-text;
+    }
+
+    &--cupboard {
+      background: vars.$color-storage-cupboard;
+      color: vars.$color-storage-cupboard-text;
+    }
+  }
+
+  &__empty {
+    padding: 64px vars.$spacing-xl;
+    border: 1px dashed vars.$color-border;
+    border-radius: vars.$radius-lg;
+    background: vars.$color-surface;
+    text-align: center;
+
+    h2 {
+      margin-bottom: vars.$spacing-sm;
+      color: vars.$color-text;
+      font-size: vars.$font-size-lg;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+@media (max-width: vars.$breakpoint-mobile) {
+  .storages-page__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

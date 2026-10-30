@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-brand-logo',
-  standalone: true,
   imports: [RouterLink],
   templateUrl: './brand-logo.component.html',
   styleUrl: './brand-logo.component.scss',

@@ -1,0 +1,18 @@
+@use "../abstracts" as vars;
+
+.dashboard-layout {
+  min-height: 100dvh;
+  background: vars.$color-background;
+}
+
+.dashboard-layout__main {
+  width: min(vars.$container-max-width, 100%);
+  margin-inline: auto;
+  padding: vars.$spacing-xl;
+}
+
+@media (max-width: vars.$breakpoint-mobile) {
+  .dashboard-layout__main {
+    padding: vars.$spacing-lg vars.$spacing-md;
+  }
+}

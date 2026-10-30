@@ -6,7 +6,6 @@ type AuthBrandVariant = 'login' | 'register';
 
 @Component({
   selector: 'app-auth-brand-panel',
-  standalone: true,
   imports: [RouterLink, BrandLogoComponent],
   templateUrl: './auth-brand-panel.component.html',
   styleUrl: './auth-brand-panel.component.scss',

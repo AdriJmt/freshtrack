@@ -2,12 +2,14 @@ import { Routes } from '@angular/router';
 
 export const AUTH_ROUTES: Routes = [
   {
-    path: 'connexion',
+    path: '',
+    title: 'Connexion | FreshTrack',
     loadComponent: () =>
       import('./pages/login/login.component').then((m) => m.LoginComponent),
   },
   {
-    path: 'inscription',
+    path: '',
+    title: 'Inscription | FreshTrack',
     loadComponent: () =>
       import('./pages/register/register.component').then(
         (m) => m.RegisterComponent,

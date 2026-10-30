@@ -1,0 +1,140 @@
+@use "styles/abstracts/variables" as vars;
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.storage-widget {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-lg;
+
+  padding: vars.$spacing-lg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-lg;
+  background: vars.$color-surface;
+}
+
+.storage-widget__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: vars.$spacing-md;
+
+  h2 {
+    margin: 0;
+    color: vars.$color-text;
+    font-size: vars.$font-size-lg;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+  }
+
+  p {
+    margin: vars.$spacing-xs 0 0;
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-sm;
+    line-height: 1.5;
+  }
+}
+
+.storage-widget__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: vars.$spacing-sm;
+}
+
+.storage-widget__add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: vars.$spacing-sm;
+  min-height: 38px;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  border: 1px solid transparent;
+  border-radius: vars.$radius-md;
+  font-family: vars.$font-family-base;
+  font-size: vars.$font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 180ms ease;
+
+  &:first-child {
+    color: vars.$color-storage-fridge-text;
+    background: vars.$color-storage-fridge;
+
+    &:hover {
+      border-color: vars.$color-storage-fridge-text;
+    }
+  }
+
+  &:last-child {
+    color: vars.$color-storage-cupboard-text;
+    background: vars.$color-storage-cupboard;
+
+    &:hover {
+      border-color: vars.$color-storage-cupboard-text;
+    }
+  }
+
+  span {
+    font-size: vars.$font-size-base;
+    line-height: 1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid vars.$color-primary;
+    outline-offset: 3px;
+  }
+}
+
+.storage-widget__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: vars.$spacing-sm;
+
+  min-height: 190px;
+  padding: vars.$spacing-xl;
+  border: 1px dashed vars.$color-border;
+  border-radius: vars.$radius-md;
+  background: vars.$color-background;
+  text-align: center;
+
+  h3 {
+    margin: 0;
+    color: vars.$color-text;
+    font-size: vars.$font-size-base;
+    font-weight: 650;
+  }
+
+  p {
+    max-width: 320px;
+    margin: 0;
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-sm;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 560px) {
+  .storage-widget {
+    gap: vars.$spacing-md;
+    padding: vars.$spacing-md;
+  }
+
+  .storage-widget__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .storage-widget__add {
+    width: 100%;
+  }
+
+  .storage-widget__empty {
+    min-height: 160px;
+    padding: vars.$spacing-lg;
+  }
+}

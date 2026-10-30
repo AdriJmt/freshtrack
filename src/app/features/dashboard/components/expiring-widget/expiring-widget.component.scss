@@ -1,0 +1,61 @@
+@use "styles/abstracts/variables" as vars;
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.expiring-widget {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-lg;
+
+  padding: vars.$spacing-lg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-lg;
+  background: vars.$color-surface;
+}
+
+.expiring-widget__heading {
+  h2 {
+    margin: 0;
+    color: vars.$color-text;
+    font-size: vars.$font-size-lg;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+  }
+
+  p {
+    margin: vars.$spacing-xs 0 0;
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-sm;
+    line-height: 1.5;
+  }
+}
+
+.expiring-widget__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 140px;
+  padding: vars.$spacing-lg;
+  border: 1px dashed vars.$color-border;
+  border-radius: vars.$radius-md;
+  background: vars.$color-background;
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-sm;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 560px) {
+  .expiring-widget {
+    gap: vars.$spacing-md;
+    padding: vars.$spacing-md;
+  }
+}

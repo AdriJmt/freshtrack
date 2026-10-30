@@ -9,7 +9,6 @@ import { AuthError } from '@supabase/supabase-js';
 
 @Component({
   selector: 'app-register-form',
-  standalone: true,
   imports: [
     FormsModule,
     RouterLink,

@@ -1,0 +1,232 @@
+@use "styles/abstracts/variables" as vars;
+
+:host {
+  display: block;
+  position: relative;
+  z-index: 10;
+}
+
+.dashboard-navbar {
+  width: 100%;
+  min-height: vars.$dashboard-navbar-height;
+  background: vars.$color-primary-dark;
+  border-bottom: 1px solid vars.$color-primary;
+}
+
+.dashboard-navbar__container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: vars.$spacing-xl;
+
+  width: 100%;
+  min-height: vars.$dashboard-navbar-height;
+  padding-inline: clamp(24px, 3vw, 64px);
+}
+
+.dashboard-navbar__brand {
+  justify-self: start;
+  min-width: 0;
+}
+
+.dashboard-navbar__navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: vars.$spacing-sm;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+    padding-inline: vars.$spacing-md;
+    border-radius: vars.$radius-md;
+
+    color: vars.$color-auth-text-muted;
+    font-family: vars.$font-family-base;
+    font-size: vars.$font-size-sm;
+    font-weight: 550;
+    text-decoration: none;
+
+    transition:
+      color 180ms ease,
+      background 180ms ease;
+
+    &:hover {
+      color: vars.$color-surface;
+      background: rgb(255 255 255 / 10%);
+    }
+
+    &.dashboard-navbar__link--active {
+      color: vars.$color-surface;
+      background: rgb(255 255 255 / 15%);
+      font-weight: 650;
+    }
+
+    &:focus-visible {
+      outline: 2px solid vars.$color-primary-light;
+      outline-offset: 3px;
+    }
+  }
+}
+
+.dashboard-navbar__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.dashboard-navbar__profile {
+  display: inline-flex;
+  align-items: center;
+  gap: vars.$spacing-sm;
+
+  padding: vars.$spacing-xs 0;
+  border: 0;
+  background: transparent;
+
+  color: vars.$color-surface;
+  font-family: vars.$font-family-base;
+  font-size: vars.$font-size-sm;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid vars.$color-primary-light;
+    outline-offset: 4px;
+    border-radius: vars.$radius-sm;
+  }
+}
+
+.dashboard-navbar__avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  background: vars.$color-surface;
+  color: vars.$color-primary;
+  font-size: vars.$font-size-sm;
+  font-weight: 700;
+}
+
+.dashboard-navbar__profile-label {
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .dashboard-navbar__container {
+    gap: vars.$spacing-lg;
+  }
+
+  .dashboard-navbar__navigation {
+    gap: 0;
+
+    a {
+      padding-inline: vars.$spacing-sm;
+    }
+  }
+}
+
+@media (max-width: vars.$breakpoint-mobile) {
+  .dashboard-navbar__container {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: vars.$spacing-md;
+    padding-top: vars.$spacing-md;
+  }
+
+  .dashboard-navbar__navigation {
+    grid-column: 1 / -1;
+    grid-row: 2;
+
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: vars.$spacing-sm;
+
+    a {
+      flex: 0 0 auto;
+      min-height: 40px;
+      font-size: vars.$font-size-xs;
+      white-space: nowrap;
+    }
+  }
+
+  .dashboard-navbar__profile-label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-navbar__navigation a {
+    transition: none;
+  }
+}
+
+.dashboard-navbar__account {
+  position: relative;
+}
+
+.dashboard-navbar__popover {
+  position: absolute;
+  top: calc(100% + vars.$spacing-md);
+  right: 0;
+  z-index: 20;
+  width: 220px;
+  padding: vars.$spacing-sm;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  background: vars.$color-surface;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+}
+
+.dashboard-navbar__popover-header {
+  padding: vars.$spacing-sm vars.$spacing-md;
+  border-bottom: 1px solid vars.$color-border;
+}
+
+.dashboard-navbar__popover-name {
+  color: vars.$color-text;
+  font-size: vars.$font-size-sm;
+  font-weight: 650;
+}
+
+.dashboard-navbar__logout {
+  width: 100%;
+  margin-top: vars.$spacing-xs;
+  padding: vars.$spacing-md;
+  border: 0;
+  border-radius: vars.$radius-sm;
+  background: transparent;
+  color: vars.$color-danger;
+  font-family: vars.$font-family-base;
+  font-size: vars.$font-size-sm;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: #fdf0ef;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  &:focus-visible {
+    outline: 2px solid vars.$color-primary;
+    outline-offset: -2px;
+  }
+}
+
+.dashboard-navbar__error {
+  margin: vars.$spacing-sm;
+  color: vars.$color-danger;
+  font-size: vars.$font-size-xs;
+}

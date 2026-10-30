@@ -1,0 +1,49 @@
+<header class="dashboard-navbar">
+    <div class="dashboard-navbar__container">
+        <app-brand-logo class="dashboard-navbar__brand" variant="light" />
+
+        <nav class="dashboard-navbar__navigation" aria-label="Navigation principale">
+            <a routerLink="/" routerLinkActive="dashboard-navbar__link--active"
+                [routerLinkActiveOptions]="{ exact: true }">
+                Tableau de bord
+            </a>
+
+            <a routerLink="/produits" routerLinkActive="dashboard-navbar__link--active">
+                Mes produits
+            </a>
+
+            <a routerLink="/stockages" routerLinkActive="dashboard-navbar__link--active">
+                Mes stockages
+            </a>
+        </nav>
+
+        <div class="dashboard-navbar__actions">
+            <div class="dashboard-navbar__account">
+                <button class="dashboard-navbar__profile" type="button" aria-label="Ouvrir le menu du compte"
+                    aria-haspopup="menu" [attr.aria-expanded]="isProfileMenuOpen()" (click)="toggleProfileMenu()">
+                    <span class="dashboard-navbar__avatar">U</span>
+                    <span class="dashboard-navbar__profile-label">Mon compte</span>
+                </button>
+
+                @if (isProfileMenuOpen()) {
+                <div class="dashboard-navbar__popover" role="menu">
+                    <div class="dashboard-navbar__popover-header">
+                        <span class="dashboard-navbar__popover-name">Mon compte</span>
+                    </div>
+
+                    <button class="dashboard-navbar__logout" type="button" role="menuitem" [disabled]="isLoggingOut()"
+                        (click)="logout()">
+                        {{ isLoggingOut() ? 'Déconnexion...' : 'Se déconnecter' }}
+                    </button>
+
+                    @if (logoutError()) {
+                    <p class="dashboard-navbar__error" role="alert">
+                        {{ logoutError() }}
+                    </p>
+                    }
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</header>

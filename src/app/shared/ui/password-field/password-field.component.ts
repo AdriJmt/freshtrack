@@ -3,7 +3,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-password-field',
-  standalone: true,
   templateUrl: './password-field.component.html',
   styleUrl: './password-field.component.scss',
   providers: [

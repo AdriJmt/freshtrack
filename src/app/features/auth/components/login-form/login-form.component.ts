@@ -8,7 +8,6 @@ import { PasswordFieldComponent } from '../../../../shared/ui/password-field/pas
 
 @Component({
   selector: 'app-login-form',
-  standalone: true,
   imports: [FormsModule, PasswordFieldComponent, RouterLink],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss',

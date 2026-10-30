@@ -1,0 +1,25 @@
+<div class="dashboard">
+    <section class="dashboard__heading">
+        <div>
+            <h1>Tableau de bord</h1>
+            <p>Retrouvez en un coup d'œil l'état de vos aliments.</p>
+        </div>
+
+        <button class="dashboard__add-button" type="button">
+            <span aria-hidden="true">+</span>
+            Ajouter un produit
+        </button>
+    </section>
+
+    <app-dashboard-stats />
+
+    <div class="dashboard__content">
+        <section class="dashboard__main-content">
+            <app-storage-widget />
+        </section>
+
+        <aside class="dashboard__sidebar">
+            <app-expiring-widget />
+        </aside>
+    </div>
+</div>

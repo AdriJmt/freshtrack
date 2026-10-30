@@ -2,7 +2,8 @@
 
 :host {
   display: inline-flex;
-  align-self: flex-start;
+  align-items: center;
+  min-width: 0;
 }
 
 .brand-logo {

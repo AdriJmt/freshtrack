@@ -22,7 +22,7 @@ $font-family-base:
   "Segoe UI",
   sans-serif;
 
-$container-max-width: 1200px;
+$container-max-width: 1600px;
 $login-form-max-width: 460px;
 
 $breakpoint-tablet: 1000px;
@@ -47,3 +47,36 @@ $font-size-auth-description: 16px;
 $font-size-auth-small: 12px;
 $spacing-auth-content: 65px;
 $spacing-auth-features: 17px;
+
+// Dashboard
+$dashboard-navbar-height: 76px;
+$dashboard-content-max-width: 1440px;
+$dashboard-sidebar-width: 320px;
+$dashboard-widget-gap: 24px;
+
+// Typography
+$font-size-xs: 11px;
+$font-size-sm: 12px;
+$font-size-base: 14px;
+$font-size-lg: 18px;
+$font-size-xl: 24px;
+
+// Components
+$button-height: 46px;
+$input-height: 54px;
+
+// Status
+$color-warning: #a15c07;
+$color-warning-background: #fff7e8;
+$color-warning-border: #f0dfbd;
+
+$breakpoint-small: 480px;
+$breakpoint-widget: 560px;
+$breakpoint-dashboard: 760px;
+$breakpoint-navigation: 900px;
+
+$color-storage-fridge: #eaf2f8;
+$color-storage-fridge-text: #426783;
+
+$color-storage-cupboard: #f5eee3;
+$color-storage-cupboard-text: #80633f;

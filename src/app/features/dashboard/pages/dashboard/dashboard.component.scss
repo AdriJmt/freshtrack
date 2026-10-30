@@ -1,0 +1,108 @@
+@use "styles/abstracts/variables" as vars;
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-xl;
+}
+
+.dashboard__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: vars.$spacing-lg;
+
+  h1 {
+    margin: vars.$spacing-sm 0;
+    color: vars.$color-text;
+    font-family: vars.$font-family-base;
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 700;
+    letter-spacing: -1.2px;
+  }
+
+  p {
+    margin: 0;
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-base;
+    line-height: 1.6;
+  }
+}
+
+.dashboard__add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: vars.$spacing-sm;
+  min-height: 38px;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  border: 0;
+  border-radius: vars.$radius-md;
+  background: vars.$color-primary;
+  color: vars.$color-surface;
+  font-family: vars.$font-family-base;
+  font-size: vars.$font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 180ms ease;
+
+  &:hover {
+    background: vars.$color-primary-dark;
+  }
+
+  span {
+    font-size: vars.$font-size-base;
+    line-height: 1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid vars.$color-primary;
+    outline-offset: 3px;
+  }
+}
+
+.dashboard__content {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    vars.$dashboard-sidebar-width;
+  align-items: start;
+  gap: vars.$dashboard-widget-gap;
+}
+
+.dashboard__main-content,
+.dashboard__sidebar {
+  min-width: 0;
+}
+
+@media (max-width: vars.$breakpoint-tablet) {
+  .dashboard__content {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: vars.$spacing-lg;
+  }
+}
+
+@media (max-width: 760px) {
+  .dashboard {
+    gap: vars.$spacing-lg;
+  }
+
+  .dashboard__content {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard__add-button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard__add-button {
+    transition: none;
+  }
+}
