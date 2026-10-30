@@ -1,0 +1,128 @@
+@use "styles/abstracts/variables" as vars;
+
+.storage-modal {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  padding: vars.$spacing-md;
+  place-items: center;
+  background: rgb(0 0 0 / 45%);
+
+  &__content {
+    width: 100%;
+    max-width: 440px;
+    padding: vars.$spacing-xl;
+    border-radius: vars.$radius-lg;
+    background: vars.$color-surface;
+    box-shadow: 0 16px 48px rgb(0 0 0 / 15%);
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: vars.$spacing-md;
+    margin-bottom: vars.$spacing-xl;
+
+    h2 {
+      margin-top: vars.$spacing-xs;
+      color: vars.$color-text;
+      font-size: vars.$font-size-lg;
+    }
+  }
+
+  &__type {
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-xs;
+  }
+
+  &__close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: vars.$radius-sm;
+    background: transparent;
+    color: vars.$color-text-muted;
+    font-size: 24px;
+    cursor: pointer;
+
+    &:hover {
+      background: vars.$color-background;
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: vars.$spacing-sm;
+  }
+
+  label {
+    margin-top: vars.$spacing-sm;
+    color: vars.$color-text;
+    font-size: vars.$font-size-sm;
+    font-weight: 600;
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-height: vars.$input-height;
+    padding: vars.$spacing-md;
+    border: 1px solid vars.$color-border;
+    border-radius: vars.$radius-md;
+    outline: none;
+    background: vars.$color-surface;
+    color: vars.$color-text;
+    font-family: vars.$font-family-base;
+    font-size: vars.$font-size-base;
+
+    &:focus {
+      border-color: vars.$color-primary;
+      box-shadow: 0 0 0 3px vars.$color-primary-light;
+    }
+  }
+
+  &__error {
+    color: vars.$color-danger;
+    font-size: vars.$font-size-sm;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: vars.$spacing-sm;
+    margin-top: vars.$spacing-lg;
+
+    button {
+      min-height: 38px;
+      padding: vars.$spacing-sm vars.$spacing-md;
+      border: none;
+      border-radius: vars.$radius-md;
+      font-family: vars.$font-family-base;
+      font-size: vars.$font-size-sm;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+  }
+
+  &__cancel {
+    background: vars.$color-background;
+    color: vars.$color-text;
+  }
+
+  &__submit {
+    background: vars.$color-primary;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: vars.$color-primary-dark;
+    }
+  }
+}

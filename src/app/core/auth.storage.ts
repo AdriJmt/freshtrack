@@ -1,16 +1,16 @@
-import type { SupportedStorage } from '@supabase/supabase-js';
-
-let rememberMe = true;
-
-export function setRememberMe(value: boolean): void {
-  rememberMe = value;
-}
+const REMEMBER_ME_KEY = 'freshtrack:remember-me';
 
 function getStorage(): Storage {
+  const rememberMe = localStorage.getItem(REMEMBER_ME_KEY) === 'true';
+
   return rememberMe ? localStorage : sessionStorage;
 }
 
-export const authStorage: SupportedStorage = {
+export function setRememberMe(value: boolean): void {
+  localStorage.setItem(REMEMBER_ME_KEY, String(value));
+}
+
+export const authStorage = {
   getItem(key: string): string | null {
     return getStorage().getItem(key);
   },
@@ -20,6 +20,7 @@ export const authStorage: SupportedStorage = {
   },
 
   removeItem(key: string): void {
-    getStorage().removeItem(key);
+    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
   },
 };

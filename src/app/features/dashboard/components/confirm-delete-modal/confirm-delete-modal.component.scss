@@ -1,0 +1,92 @@
+@use "styles/abstracts/variables" as vars;
+
+.confirm-modal {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: grid;
+  padding: vars.$spacing-md;
+  place-items: center;
+  background: rgb(0 0 0 / 45%);
+
+  &__content {
+    width: 100%;
+    max-width: 420px;
+    padding: vars.$spacing-xl;
+    border-radius: vars.$radius-lg;
+    background: vars.$color-surface;
+    box-shadow: 0 16px 48px rgb(0 0 0 / 15%);
+    text-align: center;
+  }
+
+  &__icon {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    margin: 0 auto vars.$spacing-lg;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff4f2;
+    color: vars.$color-danger;
+    font-size: vars.$font-size-lg;
+    font-weight: 700;
+  }
+
+  h2 {
+    margin-bottom: vars.$spacing-sm;
+    color: vars.$color-text;
+    font-size: vars.$font-size-lg;
+  }
+
+  p {
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-sm;
+    line-height: 1.6;
+  }
+
+  strong {
+    color: vars.$color-text;
+  }
+
+  &__error {
+    margin-top: vars.$spacing-md;
+    color: vars.$color-danger !important;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: vars.$spacing-sm;
+    margin-top: vars.$spacing-xl;
+
+    button {
+      min-height: 38px;
+      padding: vars.$spacing-sm vars.$spacing-md;
+      border: none;
+      border-radius: vars.$radius-md;
+      font-family: vars.$font-family-base;
+      font-size: vars.$font-size-sm;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+  }
+
+  &__cancel {
+    background: vars.$color-background;
+    color: vars.$color-text;
+  }
+
+  &__submit {
+    background: vars.$color-danger;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #8f1d14;
+    }
+  }
+}

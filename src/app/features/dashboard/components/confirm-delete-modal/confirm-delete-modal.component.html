@@ -1,0 +1,32 @@
+<div class="confirm-modal" (click)="cancel.emit()">
+    <section class="confirm-modal__content" role="alertdialog" aria-modal="true" aria-labelledby="confirm-modal-title"
+        aria-describedby="confirm-modal-description" (click)="$event.stopPropagation()">
+        <div class="confirm-modal__icon" aria-hidden="true">
+            !
+        </div>
+
+        <h2 id="confirm-modal-title">Supprimer ce stockage ?</h2>
+
+        <p id="confirm-modal-description">
+            Voulez-vous vraiment supprimer
+            <strong>{{ itemName() }}</strong> ?
+            Cette action est irréversible.
+        </p>
+
+        @if (errorMessage()) {
+        <p class="confirm-modal__error" role="alert">
+            {{ errorMessage() }}
+        </p>
+        }
+
+        <div class="confirm-modal__actions">
+            <button class="confirm-modal__cancel" type="button" [disabled]="deleting()" (click)="cancel.emit()">
+                Annuler
+            </button>
+
+            <button class="confirm-modal__submit" type="button" [disabled]="deleting()" (click)="confirm.emit()">
+                {{ deleting() ? 'Suppression...' : 'Supprimer' }}
+            </button>
+        </div>
+    </section>
+</div>

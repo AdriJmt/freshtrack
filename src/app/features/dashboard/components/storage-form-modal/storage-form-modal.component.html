@@ -1,0 +1,56 @@
+<div class="storage-modal" (click)="cancel.emit()">
+    <section class="storage-modal__content" role="dialog" aria-modal="true" aria-labelledby="storage-modal-title"
+        (click)="$event.stopPropagation()">
+        <div class="storage-modal__header">
+            <div>
+                <span class="storage-modal__type">
+                    {{ storage() ? 'Modifier le stockage' : 'Nouveau stockage' }}
+                </span>
+
+                <h2 id="storage-modal-title">
+                    {{ storage() ? 'Modifier les informations' : 'Ajouter un stockage' }}
+                </h2>
+            </div>
+
+            <button class="storage-modal__close" type="button" aria-label="Fermer" (click)="cancel.emit()">
+                &times;
+            </button>
+        </div>
+
+        <form (ngSubmit)="submit()">
+            <label for="storage-name">Nom du stockage</label>
+
+            <input id="storage-name" name="storageName" type="text" placeholder="Ex. : Frigo de la cuisine"
+                maxlength="80" required [ngModel]="name()" (ngModelChange)="name.set($event)" />
+
+            <label for="storage-type">Type de stockage</label>
+
+            <select id="storage-type" name="storageType" [ngModel]="type()" (ngModelChange)="type.set($event)">
+                <option value="fridge">Frigo</option>
+                <option value="cupboard">Placard</option>
+            </select>
+
+            @if (errorMessage()) {
+            <p class="storage-modal__error" role="alert">
+                {{ errorMessage() }}
+            </p>
+            }
+
+            <div class="storage-modal__actions">
+                <button class="storage-modal__cancel" type="button" [disabled]="saving()" (click)="cancel.emit()">
+                    Annuler
+                </button>
+
+                <button class="storage-modal__submit" type="submit" [disabled]="!name().trim() || saving()">
+                    {{
+                    saving()
+                    ? 'Enregistrement...'
+                    : storage()
+                    ? 'Enregistrer'
+                    : 'Créer le stockage'
+                    }}
+                </button>
+            </div>
+        </form>
+    </section>
+</div>

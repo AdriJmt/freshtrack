@@ -1,0 +1,61 @@
+<article class="product-card">
+    <div class="product-card__header">
+        <div class="product-card__identity">
+            <h2>{{ product().name }}</h2>
+
+            <span class="product-card__storage">
+                {{ storageName() }}
+            </span>
+        </div>
+
+        <div class="product-card__menu">
+            <button class="product-card__menu-trigger" type="button" aria-label="Options du produit"
+                aria-haspopup="true" [attr.aria-expanded]="isMenuOpen()" (click)="toggleMenu()">
+                <span aria-hidden="true">•••</span>
+            </button>
+
+            @if (isMenuOpen()) {
+            <div class="product-card__popover" role="menu">
+                <button type="button" role="menuitem" (click)="editProduct()">
+                    Modifier
+                </button>
+
+                <button class="product-card__delete" type="button" role="menuitem" (click)="deleteProduct()">
+                    Supprimer
+                </button>
+            </div>
+            }
+        </div>
+    </div>
+
+    <div class="product-card__details">
+        <div class="product-card__expiry">
+            <span class="product-card__label">Date de péremption</span>
+
+            <div class="product-card__expiry-value">
+                <span class="product-card__status" [class.product-card__status--expired]="expiryStatus === 'expired'"
+                    [class.product-card__status--soon]="expiryStatus === 'soon'"
+                    [class.product-card__status--normal]="expiryStatus === 'normal'"></span>
+
+                {{ expiryLabel }}
+            </div>
+        </div>
+
+        <span class="product-card__type" [class.product-card__type--dlc]="product().expiry_type === 'DLC'"
+            [class.product-card__type--ddm]="product().expiry_type === 'DDM'">
+            {{ product().expiry_type }}
+        </span>
+    </div>
+
+    @if (product().barcode) {
+    <div class="product-card__barcode">
+        Code-barres : {{ product().barcode }}
+    </div>
+    }
+
+    @if (product().package_size && product().package_unit) {
+    <div class="product-card__package">
+        {{ product().package_size }} {{ product().package_unit }}
+    </div>
+    }
+</article>

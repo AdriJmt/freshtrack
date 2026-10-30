@@ -1,0 +1,35 @@
+<article class="storage-card" [class.storage-card--fridge]="storage().type === 'fridge'"
+    [class.storage-card--cupboard]="storage().type === 'cupboard'">
+    <div class="storage-card__header">
+        <div class="storage-card__icon" aria-hidden="true">
+            {{ storage().type === 'fridge' ? '❄' : '▤' }}
+        </div>
+
+        <div class="storage-card__menu">
+            <button class="storage-card__menu-trigger" type="button" aria-label="Options du stockage"
+                aria-haspopup="true" [attr.aria-expanded]="isMenuOpen()" (click)="toggleMenu()">
+                <span aria-hidden="true">•••</span>
+            </button>
+
+            @if (isMenuOpen()) {
+            <div class="storage-card__popover" role="menu">
+                <button type="button" role="menuitem" (click)="editStorage()">
+                    Modifier
+                </button>
+
+                <button class="storage-card__delete" type="button" role="menuitem" (click)="deleteStorage()">
+                    Supprimer
+                </button>
+            </div>
+            }
+        </div>
+    </div>
+
+    <div class="storage-card__body">
+        <span class="storage-card__type">
+            {{ storage().type === 'fridge' ? 'Frigo' : 'Placard' }}
+        </span>
+
+        <h2>{{ storage().name }}</h2>
+    </div>
+</article>

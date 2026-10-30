@@ -12,6 +12,7 @@ export const DASHBOARD_ROUTES: Routes = [
     children: [
       {
         path: '',
+        title: 'Tableau de bord | FreshTrack',
         loadComponent: () =>
           import('./pages/dashboard/dashboard.component').then(
             (m) => m.DashboardComponent,

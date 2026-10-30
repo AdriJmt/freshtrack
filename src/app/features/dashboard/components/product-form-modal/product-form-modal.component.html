@@ -1,0 +1,122 @@
+<div class="product-modal" (click)="cancel.emit()">
+    <section class="product-modal__content" role="dialog" aria-modal="true" aria-labelledby="product-modal-title"
+        (click)="$event.stopPropagation()">
+        <div class="product-modal__header">
+            <div>
+                <span class="product-modal__type">
+                    {{ product() ? 'Modifier le produit' : 'Nouvel aliment' }}
+                </span>
+
+                <h2 id="product-modal-title">
+                    {{ product() ? 'Modifier les informations' : 'Ajouter un produit' }}
+                </h2>
+            </div>
+
+            <button class="product-modal__close" type="button" aria-label="Fermer" (click)="cancel.emit()">
+                &times;
+            </button>
+        </div>
+
+        <form (ngSubmit)="submit()">
+            <div class="product-modal__field">
+                <label for="product-name">Nom du produit *</label>
+
+                <input id="product-name" name="name" type="text" placeholder="Ex. : Lait demi-écrémé" maxlength="120"
+                    required [ngModel]="name()" (ngModelChange)="name.set($event)" />
+            </div>
+
+            <div class="product-modal__field">
+                <label for="product-barcode">Code-barres</label>
+
+                <input id="product-barcode" name="barcode" type="text" placeholder="Ex. : 3270190021485"
+                    [ngModel]="barcode()" (ngModelChange)="barcode.set($event)" />
+            </div>
+
+            <div class="product-modal__field">
+                <label for="product-storage">Stockage *</label>
+
+                <select id="product-storage" name="storageId" required [ngModel]="storageId()"
+                    (ngModelChange)="storageId.set($event)">
+                    <option value="" disabled>Choisir un stockage</option>
+
+                    @for (storage of storages(); track storage.id) {
+                    <option [value]="storage.id">
+                        {{ storage.name }}
+                    </option>
+                    }
+                </select>
+            </div>
+
+            <div class="product-modal__row">
+                <div class="product-modal__field">
+                    <label for="product-expiry">Date de péremption *</label>
+
+                    <input id="product-expiry" name="expiryDate" type="date" required [ngModel]="expiryDate()"
+                        (ngModelChange)="expiryDate.set($event)" />
+                </div>
+
+                <div class="product-modal__field">
+                    <label for="product-expiry-type">Type *</label>
+
+                    <select id="product-expiry-type" name="expiryType" required [ngModel]="expiryType()"
+                        (ngModelChange)="expiryType.set($event)">
+                        <option value="DLC">DLC</option>
+                        <option value="DDM">DDM</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="product-modal__row">
+                <div class="product-modal__field">
+                    <label for="product-package-size">Contenance</label>
+
+                    <input id="product-package-size" name="packageSize" type="number" min="0.01" step="any"
+                        placeholder="Ex. : 1" [ngModel]="packageSize()"
+                        (ngModelChange)="packageSize.set($event === null || $event === '' ? null : +$event)" />
+                </div>
+
+                <div class="product-modal__field">
+                    <label for="product-package-unit">Unité</label>
+
+                    <select id="product-package-unit" name="packageUnit" [ngModel]="packageUnit()"
+                        (ngModelChange)="packageUnit.set($event)">
+                        <option value="">Aucune</option>
+                        <option value="g">g</option>
+                        <option value="kg">kg</option>
+                        <option value="ml">ml</option>
+                        <option value="L">L</option>
+                        <option value="cl">cl</option>
+                        <option value="unité">unité</option>
+                    </select>
+                </div>
+            </div>
+
+            @if (errorMessage()) {
+            <p class="product-modal__error" role="alert">
+                {{ errorMessage() }}
+            </p>
+            }
+
+            <div class="product-modal__actions">
+                <button class="product-modal__cancel" type="button" [disabled]="saving()" (click)="cancel.emit()">
+                    Annuler
+                </button>
+
+                <button class="product-modal__submit" type="submit" [disabled]="
+            !name().trim() ||
+            !storageId() ||
+            !expiryDate() ||
+            saving()
+          ">
+                    {{
+                    saving()
+                    ? 'Enregistrement...'
+                    : product()
+                    ? 'Enregistrer'
+                    : 'Ajouter le produit'
+                    }}
+                </button>
+            </div>
+        </form>
+    </section>
+</div>

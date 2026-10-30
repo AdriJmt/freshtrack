@@ -6,24 +6,54 @@
         </div>
 
         <div class="storages-page__actions">
-            <button class="storages-page__add storages-page__add--fridge" type="button">
+            <button class="storages-page__add storages-page__add--fridge" type="button"
+                (click)="openCreateModal('fridge')">
                 <span aria-hidden="true">+</span>
                 Ajouter un frigo
             </button>
 
-            <button class="storages-page__add storages-page__add--cupboard" type="button">
+            <button class="storages-page__add storages-page__add--cupboard" type="button"
+                (click)="openCreateModal('cupboard')">
                 <span aria-hidden="true">+</span>
                 Ajouter un placard
             </button>
         </div>
     </section>
 
+    @if (errorMessage(); as error) {
+    <div class="storages-page__error" role="alert">
+        {{ error }}
+    </div>
+    }
+
     <section class="storages-page__content">
+        @if (isLoading()) {
+        <div class="storages-page__state">
+            Chargement des stockages...
+        </div>
+        } @else if (storages().length === 0) {
         <div class="storages-page__empty">
             <h2>Aucun stockage pour le moment</h2>
             <p>
                 Créez votre premier frigo ou placard pour organiser vos aliments.
             </p>
         </div>
+        } @else {
+        <div class="storages-page__grid">
+            @for (storage of storages(); track storage.id) {
+            <app-storage-card [storage]="storage" (edit)="openEditModal($event)" (delete)="openDeleteModal($event)" />
+            }
+        </div>
+        }
     </section>
 </div>
+
+@if (isFormModalOpen()) {
+<app-storage-form-modal [storage]="selectedStorage()" [initialType]="newStorageType()" [saving]="isSaving()"
+    [errorMessage]="errorMessage()" (save)="saveStorage($event)" (cancel)="closeFormModal()" />
+}
+
+@if (isDeleteModalOpen() && selectedStorage()) {
+<app-confirm-delete-modal [itemName]="selectedStorage()!.name" [deleting]="isDeleting()" [errorMessage]="errorMessage()"
+    (confirm)="confirmDelete()" (cancel)="closeDeleteModal()" />
+}
