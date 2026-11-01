@@ -1,0 +1,80 @@
+@if (currentMode() === 'manual') {
+<div class="add-modal">
+    <dialog class="add-modal__content" [class.add-modal__content--manual]="currentMode() === 'manual'" open>
+        <app-manual-product-form [storages]="storages()" (save)="onSave($event)" (cancel)="backToModes()" />
+
+        @if (errorMessage()) {
+        <p class="add-modal__error" role="alert">
+            {{ errorMessage() }}
+        </p>
+        }
+
+        @if (isSaving()) {
+        <p class="add-modal__loading" role="status">
+            Enregistrement des produits...
+        </p>
+        }
+    </dialog>
+</div>
+} @else if (currentMode() === 'scan') {
+<div class="add-modal">
+    <dialog class="add-modal__content" open>
+        <header class="add-modal__header">
+            <div>
+                <span>Nouvel inventaire</span>
+                <h2>Scanner avec mon téléphone</h2>
+                <p>Le parcours de scan sera disponible prochainement.</p>
+            </div>
+        </header>
+
+        <button type="button" (click)="backToModes()">
+            Retour
+        </button>
+    </dialog>
+</div>
+} @else {
+<div class="add-modal">
+    <dialog class="add-modal__content" open aria-labelledby="add-modal-title">
+        <header class="add-modal__header">
+            <div>
+                <h2 id="add-modal-title">Ajouter des produits</h2>
+                <p>Comment souhaitez-vous ajouter vos aliments ?</p>
+            </div>
+
+            <button type="button" aria-label="Fermer" (click)="cancel.emit()">
+                &times;
+            </button>
+        </header>
+
+        <div class="add-modal__options">
+            <button class="add-modal__option" type="button" (click)="onSelectMode('manual')">
+                <span class="add-modal__icon" aria-hidden="true">⌨</span>
+
+                <span class="add-modal__description">
+                    <strong>Ajout manuel</strong>
+                    <small>Saisissez vos produits et leurs dates de péremption.</small>
+                </span>
+
+                <span class="add-modal__arrow" aria-hidden="true">›</span>
+            </button>
+
+            <button class="add-modal__option" type="button" (click)="onSelectMode('scan')">
+                <span class="add-modal__icon" aria-hidden="true">▯</span>
+
+                <span class="add-modal__description">
+                    <strong>Scanner avec mon téléphone</strong>
+                    <small>
+                        Scannez un QR code pour ajouter plusieurs produits depuis votre mobile.
+                    </small>
+                </span>
+
+                <span class="add-modal__arrow" aria-hidden="true">›</span>
+            </button>
+        </div>
+
+        <button class="add-modal__cancel" type="button" (click)="cancel.emit()">
+            Annuler
+        </button>
+    </dialog>
+</div>
+}

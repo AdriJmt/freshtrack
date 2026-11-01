@@ -1,119 +1,266 @@
-import { computed, Injectable, signal } from '@angular/core';
-import { Session, User } from '@supabase/supabase-js';
-import { supabase } from './supabase.client';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-import { setRememberMe } from './auth.storage';
+import {
+  AuthResponseDto,
+  CsrfTokenResponseDto,
+  RegisterRequestDto,
+  RegisterResponseDto,
+  VerifyEmailRequestDto,
+  ResendCodeRequestDto,
+  ResendCodeResponseDto,
+  LoginRequestDto,
+  VerificationLinkResponseDto,
+} from './api/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  // Signal pour stocker l'état de la session actuelle. Initialisé à null, ce signal sera mis à jour lorsque l'utilisateur se connecte ou se déconnecte.
-  private readonly sessionState = signal<Session | null>(null);
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
 
-  // Signal pour stocker l'état de l'utilisateur actuel. Initialisé à null, ce signal sera mis à jour lorsque l'utilisateur se connecte ou se déconnecte.
-  private readonly userState = signal<User | null>(null);
+  private readonly accessTokenState = signal<string | null>(null);
+  private readonly verificationStorageKey = 'freshtrack_verification_id';
 
-  // Signal pour indiquer si le service d'authentification a été initialisé. Initialisé à false, ce signal sera mis à jour à true une fois que l'état de la session aura été déterminé.
+  private readonly userState = signal<Pick<
+    AuthResponseDto,
+    'userId' | 'email' | 'displayName'
+  > | null>(null);
+
   private readonly initializedState = signal(false);
 
-  // Signaux en lecture seule pour exposer l'état de la session, de l'utilisateur et de l'initialisation aux composants qui consomment ce service.
-  readonly session = this.sessionState.asReadonly();
-
-  // Signaux en lecture seule pour exposer l'état de l'utilisateur actuel aux composants qui consomment ce service.
+  readonly accessToken = this.accessTokenState.asReadonly();
   readonly currentUser = this.userState.asReadonly();
-
-  // Signaux en lecture seule pour indiquer si le service d'authentification a été initialisé.
   readonly isInitialized = this.initializedState.asReadonly();
 
-  // Signal en lecture seule pour indiquer si un utilisateur est actuellement authentifié. Il est calculé en vérifiant si l'utilisateur actuel n'est pas null.
-  readonly isAuthenticated = computed(() => this.currentUser() !== null);
+  readonly isAuthenticated = computed(() => this.accessTokenState() !== null);
 
-  constructor() {
-    supabase.auth.onAuthStateChange((_event, session) => {
-      this.updateSession(session);
-      this.initializedState.set(true);
-    });
-  }
+  private csrfToken: string | null = null;
 
   /**
-   * Inscrit un nouvel utilisateur en utilisant Supabase.
-   * Met à jour l'état de la session et de l'utilisateur après l'inscription.
-   * Si une erreur se produit lors de l'inscription, elle est levée pour être gérée par l'appelant.
-   * @param {string} email - L'adresse e-mail de l'utilisateur à inscrire.
-   * @param {string} password - Le mot de passe de l'utilisateur à inscrire.
-   * @returns {Promise<User | null>} Une promesse qui se résout avec l'utilisateur inscrit ou null si l'inscription échoue.
-   * @throws {Error} Si une erreur se produit lors de l'inscription.
+   * Initialise l'authentification en essayant de récupérer
+   * un nouvel access token à partir du cookie HttpOnly.
    */
-  async register(email: string, password: string): Promise<User | null> {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      throw error;
+  async initialize(): Promise<void> {
+    if (this.initializedState()) {
+      return;
     }
 
-    this.updateSession(data.session);
-
-    return data.user;
+    try {
+      await this.refreshAccessToken();
+    } catch {
+      this.clearAuthentication();
+    } finally {
+      this.initializedState.set(true);
+    }
   }
 
   /**
-   * Connecte un utilisateur existant en utilisant Supabase.
-   * Met à jour l'état de la session et de l'utilisateur après la connexion.
-   * Si une erreur se produit lors de la connexion, elle est levée pour être gérée par l'appelant.
-   * @param {string} email - L'adresse e-mail de l'utilisateur à connecter.
-   * @param {string} password - Le mot de passe de l'utilisateur à connecter.
-   * @param {boolean} remember - Indique si l'utilisateur souhaite rester connecté (true) ou non (false).
-   * @returns {Promise<User>} Une promesse qui se résout avec l'utilisateur connecté.
-   * @throws {Error} Si une erreur se produit lors de la connexion.
+   * Inscrit un nouvel utilisateur et récupère l'identifiant
+   * de sa demande de vérification.
+   */
+  async register(request: RegisterRequestDto): Promise<string> {
+    const response = await firstValueFrom(
+      this.http.post<RegisterResponseDto>(`${this.apiUrl}/register`, request),
+    );
+
+    if (!response.verificationId) {
+      throw new Error('Identifiant de vérification manquant.');
+    }
+
+    this.setVerificationId(response.verificationId);
+
+    return response.verificationId;
+  }
+
+  /**
+   * Vérifie l'adresse e-mail avec le code reçu.
+   */
+  async verifyEmail(request: VerifyEmailRequestDto): Promise<void> {
+    await firstValueFrom(
+      this.http.post<void>(`${this.apiUrl}/verify-email`, request),
+    );
+
+    this.clearVerificationId();
+  }
+
+  /**
+   * Demande un nouveau code de vérification.
+   */
+  async resendCode(request: ResendCodeRequestDto): Promise<string> {
+    const response = await firstValueFrom(
+      this.http.post<ResendCodeResponseDto>(
+        `${this.apiUrl}/resend-code`,
+        request,
+      ),
+    );
+
+    if (!response.verificationId) {
+      throw new Error('Identifiant de vérification manquant.');
+    }
+
+    this.setVerificationId(response.verificationId);
+
+    return response.verificationId;
+  }
+
+  /**
+   * Récupère l'identifiant associé au lien de récupération.
+   */
+  async getVerificationLink(
+    token: string,
+  ): Promise<VerificationLinkResponseDto> {
+    return firstValueFrom(
+      this.http.get<VerificationLinkResponseDto>(
+        `${this.apiUrl}/verification-link`,
+        {
+          params: { token },
+        },
+      ),
+    );
+  }
+
+  /**
+   * Stocke l'identifiant de vérification pour la session courante.
+   */
+  setVerificationId(verificationId: string): void {
+    sessionStorage.setItem(this.verificationStorageKey, verificationId);
+  }
+
+  /**
+   * Récupère l'identifiant de vérification de la session courante.
+   */
+  getVerificationId(): string | null {
+    return sessionStorage.getItem(this.verificationStorageKey);
+  }
+
+  /**
+   * Supprime l'identifiant de vérification.
+   */
+  clearVerificationId(): void {
+    sessionStorage.removeItem(this.verificationStorageKey);
+  }
+
+  /**
+   * Connecte un utilisateur.
+   * Le refresh token est automatiquement stocké
+   * dans le cookie HttpOnly par le navigateur.
    */
   async login(
     email: string,
     password: string,
-    remember: boolean,
-  ): Promise<User> {
-    setRememberMe(remember);
-
-    const { data, error } = await supabase.auth.signInWithPassword({
+  ): Promise<Pick<AuthResponseDto, 'userId' | 'email' | 'displayName'>> {
+    const request: LoginRequestDto = {
       email,
       password,
+    };
+
+    const response = await firstValueFrom(
+      this.http.post<AuthResponseDto>(`${this.apiUrl}/login`, request, {
+        withCredentials: true,
+      }),
+    );
+
+    this.updateAuthentication(response);
+
+    return this.userState()!;
+  }
+
+  /**
+   * Renouvelle l'access token à partir du refresh token.
+   */
+  async refreshAccessToken(): Promise<void> {
+    const csrfToken = await this.getCsrfToken();
+
+    const headers = new HttpHeaders({
+      'X-XSRF-TOKEN': csrfToken,
     });
 
-    if (error) {
-      throw error;
-    }
+    const response = await firstValueFrom(
+      this.http.post<AuthResponseDto>(
+        `${this.apiUrl}/refresh`,
+        {},
+        {
+          headers,
+          withCredentials: true,
+        },
+      ),
+    );
 
-    this.updateSession(data.session);
-
-    return data.user;
+    this.updateAuthentication(response);
   }
 
   /**
-   * Déconnecte l'utilisateur actuel en utilisant Supabase.
-   * Met à jour l'état de la session et de l'utilisateur après la déconnexion.
-   * Si une erreur se produit lors de la déconnexion, elle est levée pour être gérée par l'appelant.
-   * @returns {Promise<void>} Une promesse qui se résout lorsque la déconnexion est terminée.
-   * @throws {Error} Si une erreur se produit lors de la déconnexion.
+   * Déconnecte l'utilisateur et révoque son refresh token.
    */
   async logout(): Promise<void> {
-    const { error } = await supabase.auth.signOut();
+    try {
+      const csrfToken = await this.getCsrfToken();
 
-    if (error) {
-      throw error;
+      const headers = new HttpHeaders({
+        'X-XSRF-TOKEN': csrfToken,
+      });
+
+      await firstValueFrom(
+        this.http.post<void>(
+          `${this.apiUrl}/logout`,
+          {},
+          {
+            headers,
+            withCredentials: true,
+          },
+        ),
+      );
+    } finally {
+      this.clearAuthentication();
     }
-
-    this.updateSession(null);
   }
 
   /**
-   * Met à jour l'état de la session et de l'utilisateur dans les signaux correspondants.
-   * @param {Session | null} session - La nouvelle session à définir. Si null, cela signifie que l'utilisateur est déconnecté.
+   * Récupère un token CSRF auprès du backend.
    */
-  private updateSession(session: Session | null): void {
-    this.sessionState.set(session);
-    this.userState.set(session?.user ?? null);
+  private async getCsrfToken(): Promise<string> {
+    const response = await firstValueFrom(
+      this.http.get<CsrfTokenResponseDto>(`${this.apiUrl}/csrf`, {
+        withCredentials: true,
+      }),
+    );
+
+    if (!response.token) {
+      throw new Error('Le serveur n’a pas retourné de token CSRF.');
+    }
+
+    this.csrfToken = response.token;
+
+    return response.token;
+  }
+
+  /**
+   * Met à jour les informations d'authentification.
+   */
+  private updateAuthentication(response: AuthResponseDto): void {
+    if (!response.accessToken) {
+      throw new Error('La réponse du serveur ne contient pas d’access token.');
+    }
+
+    this.accessTokenState.set(response.accessToken);
+
+    this.userState.set({
+      userId: response.userId,
+      email: response.email,
+      displayName: response.displayName,
+    });
+  }
+
+  /**
+   * Supprime l'état d'authentification local.
+   */
+  private clearAuthentication(): void {
+    this.accessTokenState.set(null);
+    this.userState.set(null);
+    this.csrfToken = null;
   }
 }

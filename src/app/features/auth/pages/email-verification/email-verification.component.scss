@@ -1,0 +1,223 @@
+@use "styles/abstracts" as vars;
+
+.verification-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: vars.$spacing-xl vars.$spacing-md;
+  background: vars.$color-background;
+  font-family: vars.$font-family-base;
+}
+
+.verification-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 2.75rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: vars.$spacing-xl;
+  background: vars.$color-surface;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-lg;
+  box-shadow: 0 12px 40px rgb(32 41 35 / 5%);
+}
+
+.verification-state {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: vars.$spacing-lg;
+}
+
+.verification-icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: vars.$color-primary;
+  background: vars.$color-primary-light;
+  border-radius: 50%;
+
+  svg {
+    width: 29px;
+    height: 29px;
+  }
+}
+
+.verification-icon-error {
+  color: vars.$color-danger;
+  background: rgb(180 35 24 / 8%);
+}
+
+.verification-heading {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-sm;
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    color: vars.$color-text;
+    font-size: vars.$font-size-xl;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  p {
+    margin: 0;
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-base;
+    line-height: 1.7;
+  }
+
+  strong {
+    color: vars.$color-text;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+}
+
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-lg;
+}
+
+.message {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: vars.$radius-sm;
+  font-size: vars.$font-size-sm;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.message-error {
+  color: vars.$color-danger;
+  background: rgb(180 35 24 / 7%);
+}
+
+.message-success {
+  color: vars.$color-primary-dark;
+  background: vars.$color-primary-light;
+}
+
+.submit-button {
+  width: 100%;
+  min-height: vars.$button-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: vars.$radius-md;
+  background: vars.$color-primary;
+  color: #fff;
+  font: inherit;
+  font-size: vars.$font-size-base;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    opacity 150ms ease;
+
+  &:hover:not(:disabled) {
+    background: vars.$color-primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.resend-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: vars.$spacing-xs;
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: vars.$color-text-muted;
+    font-size: vars.$font-size-sm;
+  }
+}
+
+.resend-button,
+.back-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: vars.$color-primary;
+  font: inherit;
+  font-size: vars.$font-size-sm;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: vars.$color-primary-dark;
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.back-link {
+  color: vars.$color-text-muted;
+  font-weight: 500;
+}
+
+.loader {
+  width: 25px;
+  height: 25px;
+  border: 2px solid vars.$color-border;
+  border-top-color: vars.$color-primary;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+.verification-icon-success {
+  color: var(--success-color, #16a34a);
+}
+
+.redirect-message {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .verification-page {
+    padding: vars.$spacing-lg vars.$spacing-md;
+  }
+
+  .verification-card {
+    padding: vars.$spacing-xl vars.$spacing-lg;
+  }
+
+  .verification-heading h1 {
+    font-size: 21px;
+  }
+}

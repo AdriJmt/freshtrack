@@ -1,0 +1,132 @@
+<div class="verification-page">
+    <main class="verification-card">
+        <app-brand-logo />
+
+        @if (isLoading) {
+        <div class="verification-state">
+            <div class="verification-icon">
+                <span class="loader"></span>
+            </div>
+
+            <div class="verification-heading">
+                <h1>Préparation de la vérification</h1>
+                <p>Nous préparons votre formulaire de confirmation...</p>
+            </div>
+        </div>
+        } @else if (isVerified) {
+        <div class="verification-state">
+            <div class="verification-icon verification-icon-success">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="m8 12 2.5 2.5L16 9" />
+                </svg>
+            </div>
+
+            <div class="verification-heading">
+                <h1>Adresse e-mail confirmée !</h1>
+
+                <p>
+                    Votre adresse e-mail a été vérifiée avec succès.
+                    Votre compte est maintenant activé.
+                </p>
+
+                <p class="redirect-message" role="status">
+                    Vous allez être redirigé vers la page de connexion
+                    dans {{ redirectDelay }} secondes...
+                </p>
+            </div>
+
+            <a routerLink="/connexion" [queryParams]="{ verified: true }" class="submit-button">
+                Continuer
+            </a>
+        </div>
+        } @else if (verificationId) {
+        <div class="verification-state">
+            <div class="verification-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="m3 7 9 6 9-6" />
+                    <path d="m9 12 2 2 4-4" />
+                </svg>
+            </div>
+
+            <div class="verification-heading">
+                <h1>Confirmez votre adresse e-mail</h1>
+
+                <p>
+                    Saisissez le code à 6 chiffres envoyé à votre adresse e-mail.
+                </p>
+
+                <p>
+                    Vous devez confirmer votre adresse pour activer votre compte.
+                </p>
+            </div>
+
+            <form (submit)="$event.preventDefault(); verifyEmail()">
+                <app-otp-input (codeChange)="onCodeChange($event)" />
+
+                @if (errorMessage) {
+                <p class="message message-error" role="alert">
+                    {{ errorMessage }}
+                </p>
+                }
+
+                @if (successMessage) {
+                <p class="message message-success" role="status">
+                    {{ successMessage }}
+                </p>
+                }
+
+                <button class="submit-button" type="submit" [disabled]="isSubmitting || code.length !== 6">
+                    {{
+                    isSubmitting
+                    ? 'Vérification...'
+                    : 'Confirmer mon adresse e-mail'
+                    }}
+                </button>
+            </form>
+
+            <div class="resend-section">
+                <p>Vous n'avez pas reçu le code ?</p>
+
+                <button type="button" class="resend-button" [disabled]="isResending" (click)="resendCode()">
+                    {{ isResending ? 'Envoi en cours...' : 'Renvoyer le code' }}
+                </button>
+            </div>
+        </div>
+        } @else {
+        <div class="verification-state">
+            <div class="verification-icon verification-icon-error">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="m15 9-6 6m0-6 6 6" />
+                </svg>
+            </div>
+
+            <div class="verification-heading">
+                <h1>Vérification indisponible</h1>
+
+                <p>
+                    {{
+                    errorMessage ||
+                    'Votre demande de vérification est invalide ou a expiré.'
+                    }}
+                </p>
+            </div>
+
+            <a routerLink="/inscription" class="submit-button">
+                Créer un compte
+            </a>
+        </div>
+        }
+
+        @if (!isVerified) {
+        <a routerLink="/connexion" class="back-link">
+            Retour à la connexion
+        </a>
+        }
+    </main>
+</div>

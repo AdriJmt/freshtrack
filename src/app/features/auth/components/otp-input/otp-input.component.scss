@@ -1,0 +1,48 @@
+@use "styles/abstracts" as vars;
+
+.otp-input {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+
+  input {
+    box-sizing: border-box;
+    width: 2.75rem;
+    height: 3.25rem;
+    padding: 0;
+
+    border: 1px solid vars.$color-border;
+    border-radius: vars.$radius-md;
+    background: vars.$color-surface;
+
+    color: vars.$color-text;
+    font-family: vars.$font-family-base;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+
+    outline: none;
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+
+    &:focus {
+      border-color: vars.$color-primary;
+      box-shadow: 0 0 0 3px rgb(40 91 69 / 12%);
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .otp-input {
+    gap: 0.4rem;
+
+    input {
+      width: 2.4rem;
+      height: 2.9rem;
+      font-size: 1.1rem;
+    }
+  }
+}

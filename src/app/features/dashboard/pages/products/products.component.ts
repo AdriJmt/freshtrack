@@ -11,15 +11,21 @@ import {
 import { Storage } from '../../../../core/models/storage.model';
 
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
-import { ProductFormModalComponent } from '../../components/product-form-modal/product-form-modal.component';
 import { ConfirmDeleteModalComponent } from '../../components/confirm-delete-modal/confirm-delete-modal.component';
+import {
+  ProductAddModalComponent,
+} from '../../components/product-add-modal/product-add-modal.component';
+import { ManualProductSubmission } from '../../components/manual-product-form/manual-product-form.component';
+
+type ExpiryFilter = 'all' | 'expired' | 'soon' | 'normal';
+type ExpiryTypeFilter = 'all' | 'DLC' | 'DDM';
 
 @Component({
   selector: 'app-products',
   imports: [
     ProductCardComponent,
-    ProductFormModalComponent,
     ConfirmDeleteModalComponent,
+    ProductAddModalComponent,
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss',
@@ -46,9 +52,39 @@ export class ProductsComponent implements OnInit {
 
   readonly selectedProduct = signal<Product | null>(null);
 
+  readonly searchTerm = signal('');
+  readonly selectedStorageId = signal('all');
+  readonly selectedExpiryType = signal<ExpiryTypeFilter>('all');
+  readonly selectedExpiryFilter = signal<ExpiryFilter>('all');
+
   ngOnInit(): void {
     void this.loadData();
   }
+
+  readonly filteredProducts = computed(() => {
+    const search = this.searchTerm().trim().toLowerCase();
+    const storageId = this.selectedStorageId();
+    const expiryType = this.selectedExpiryType();
+    const expiryFilter = this.selectedExpiryFilter();
+
+    return this.products().filter((product) => {
+      const matchesSearch = product.name.toLowerCase().includes(search);
+
+      const matchesStorage =
+        storageId === 'all' || product.storage_id === storageId;
+
+      const matchesExpiryType =
+        expiryType === 'all' || product.expiry_type === expiryType;
+
+      const matchesExpiry =
+        expiryFilter === 'all' ||
+        this.getExpiryStatus(product.expiry_date) === expiryFilter;
+
+      return (
+        matchesSearch && matchesStorage && matchesExpiryType && matchesExpiry
+      );
+    });
+  });
 
   async loadData(): Promise<void> {
     this.isLoading.set(true);
@@ -68,12 +104,6 @@ export class ProductsComponent implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  openCreateModal(): void {
-    this.selectedProduct.set(null);
-    this.errorMessage.set(null);
-    this.isFormModalOpen.set(true);
   }
 
   openEditModal(product: Product): void {
@@ -185,4 +215,32 @@ export class ProductsComponent implements OnInit {
       this.isDeleting.set(false);
     }
   }
+
+  private getExpiryStatus(expiryDate: string): ExpiryFilter {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const expiry = new Date(`${expiryDate}T00:00:00`);
+
+    const difference = Math.ceil(
+      (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    if (difference < 0) return 'expired';
+    if (difference <= 3) return 'soon';
+
+    return 'normal';
+  }
+
+  readonly isAddModalOpen = signal(false);
+
+  openAddModal(): void {
+    this.isAddModalOpen.set(true);
+  }
+
+  closeAddModal(): void {
+    this.isAddModalOpen.set(false);
+  }
+
+ 
 }

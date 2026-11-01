@@ -45,11 +45,6 @@
         </p>
         }
 
-        @if (successMessage) {
-        <output class="register-form__message register-form__message--success">
-            {{ successMessage }}
-        </output>
-        }
 
         <button class="button button--primary" type="submit"
             [disabled]="registerForm.invalid || isSubmitting || password !== confirmPassword">

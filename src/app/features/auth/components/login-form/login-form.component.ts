@@ -15,7 +15,6 @@ import { PasswordFieldComponent } from '../../../../shared/ui/password-field/pas
 export class LoginFormComponent {
   email = '';
   password = '';
-  rememberMe = false;
 
   isSubmitting = false;
   errorMessage = '';
@@ -36,7 +35,7 @@ export class LoginFormComponent {
     this.isSubmitting = true;
 
     try {
-      await this.authService.login(this.email, this.password, this.rememberMe);
+      await this.authService.login(this.email, this.password);
       await this.router.navigate(['/']);
     } catch (error: unknown) {
       if (error instanceof AuthError && error.code === 'invalid_credentials') {

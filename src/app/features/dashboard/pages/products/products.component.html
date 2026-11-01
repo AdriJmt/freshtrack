@@ -6,10 +6,43 @@
         </div>
 
         <button class="products-page__add-button" type="button" [disabled]="storages().length === 0 && !isLoading()"
-            (click)="openCreateModal()">
+            (click)="openAddModal()">
             <span aria-hidden="true">+</span>
             Ajouter un produit
         </button>
+    </section>
+
+    <section class="products-page__filters">
+        <div class="products-page__search">
+            <input type="search" placeholder="Rechercher un produit..." aria-label="Rechercher un produit"
+                [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" />
+        </div>
+
+        <select aria-label="Filtrer par stockage" [value]="selectedStorageId()"
+            (change)="selectedStorageId.set($any($event.target).value)">
+            <option value="all">Tous les stockages</option>
+
+            @for (storage of storages(); track storage.id) {
+            <option [value]="storage.id">
+                {{ storage.name }}
+            </option>
+            }
+        </select>
+
+        <select aria-label="Filtrer par type de péremption" [value]="selectedExpiryType()"
+            (change)="selectedExpiryType.set($any($event.target).value)">
+            <option value="all">Toutes les dates</option>
+            <option value="DLC">DLC</option>
+            <option value="DDM">DDM</option>
+        </select>
+
+        <select aria-label="Filtrer par état de péremption" [value]="selectedExpiryFilter()"
+            (change)="selectedExpiryFilter.set($any($event.target).value)">
+            <option value="all">Tous les états</option>
+            <option value="expired">Expirés</option>
+            <option value="soon">Bientôt périmés</option>
+            <option value="normal">À jour</option>
+        </select>
     </section>
 
     @if (errorMessage(); as error) {
@@ -23,22 +56,23 @@
         <div class="products-page__state">
             Chargement des produits...
         </div>
-        } @else if (products().length === 0) {
+        } @else if (filteredProducts().length === 0) {
         <div class="products-page__empty">
-            <h2>Aucun produit pour le moment</h2>
+            <h2>Aucun résultat</h2>
             <p>
-                Ajoutez votre premier produit pour commencer à suivre votre inventaire.
+                Aucun produit ne correspond à tes critères de recherche.
             </p>
-
-            @if (storages().length === 0) {
-            <p class="products-page__hint">
-                Vous devez d'abord créer un frigo ou un placard.
-            </p>
-            }
         </div>
         } @else {
+        <div class="products-page__results">
+            <span>
+                {{ filteredProducts().length }}
+                produit(s)
+            </span>
+        </div>
+
         <div class="products-page__grid">
-            @for (product of products(); track product.id) {
+            @for (product of filteredProducts(); track product.id) {
             <app-product-card [product]="product"
                 [storageName]="storageNames().get(product.storage_id) ?? 'Stockage inconnu'"
                 (edit)="openEditModal($event)" (delete)="openDeleteModal($event)" />
@@ -48,9 +82,8 @@
     </section>
 </div>
 
-@if (isFormModalOpen()) {
-<app-product-form-modal [product]="selectedProduct()" [storages]="storages()" [saving]="isSaving()"
-    [errorMessage]="errorMessage()" (save)="saveProduct($event)" (cancel)="closeFormModal()" />
+@if (isAddModalOpen()) {
+<app-product-add-modal [storages]="storages()" (cancel)="closeAddModal()" (productsAdded)="loadData()" />
 }
 
 @if (isDeleteModalOpen() && selectedProduct()) {
