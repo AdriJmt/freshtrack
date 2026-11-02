@@ -1,25 +1,92 @@
-<div class="dashboard">
-    <section class="dashboard__heading">
-        <div>
-            <h1>Tableau de bord</h1>
-            <p>Retrouvez en un coup d'œil l'état de vos aliments.</p>
-        </div>
-
-        <button class="dashboard__add-button" type="button">
-            <span aria-hidden="true">+</span>
-            Ajouter un produit
-        </button>
-    </section>
-
-    <app-dashboard-stats />
-
-    <div class="dashboard__content">
-        <section class="dashboard__main-content">
-            <app-storage-widget />
-        </section>
-
-        <aside class="dashboard__sidebar">
-            <app-expiring-widget />
-        </aside>
+<div class="workspace">
+  <header class="workspace__heading">
+    <div>
+      <h1>
+        Bonjour{{ user()?.displayName ? ', ' + user()?.displayName : '' }}.
+      </h1>
+      <p>Un aperçu de vos réserves et des aliments à surveiller.</p>
     </div>
+    <button
+      class="action action--primary"
+      type="button"
+      [disabled]="inventory.loading() || !inventory.storages().length"
+      (click)="adding.set(true)"
+    >
+      ＋ Ajouter un produit
+    </button>
+  </header>
+  @if (inventory.error()) {
+    <div class="workspace__error" role="alert">
+      {{ inventory.error()
+      }}<button class="action" (click)="inventory.load(true)">Réessayer</button>
+    </div>
+  }
+  @if (inventory.loading()) {
+    <app-content-skeleton
+      variant="stats"
+      label="Chargement des statistiques"
+      [count]="5"
+    /><div class="dashboard-columns"><app-content-skeleton variant="products" label="Chargement des produits à surveiller" [count]="6" /><app-content-skeleton variant="storages" columns="single" label="Chargement des stockages" [count]="2" /></div>
+  } @else if (!inventory.error()) {
+    <app-dashboard-stats
+      [products]="inventory.products()"
+      [storageCount]="inventory.storages().length"
+    />
+    @if (!inventory.storages().length) {
+      <div class="workspace__empty">
+        <h2>Commençons par votre premier stockage</h2>
+        <p>Créez un frigo ou un placard, puis ajoutez vos premiers aliments.</p>
+        <div class="onboarding-actions">
+          <button
+            class="action action--primary"
+            (click)="editor.open({ type: 'FRIDGE' })"
+          >
+            Créer un réfrigérateur</button
+          ><button class="action" (click)="editor.open({ type: 'CUPBOARD' })">
+            Créer un placard
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="dashboard-columns">
+        <app-expiring-widget
+          [products]="inventory.products()"
+          [storageNames]="inventory.storageNames()"
+        /><app-storage-widget
+          [storages]="inventory.storages()"
+          [summaries]="inventory.summaries()"
+          (addStorage)="editor.open({ type: $event })"
+          (editStorage)="editor.open($event)"
+          (deleteStorage)="editor.open($event, 'delete')"
+        />
+      </div>
+    }
+  }
 </div>
+@if (adding()) {
+  <app-product-add-modal
+    [storages]="inventory.storages()"
+    (cancel)="adding.set(false)"
+    (productsAdded)="inventory.load(true)"
+  />
+}
+@if (editor.mode() === 'form') {
+  <app-storage-form-modal
+    [storage]="editor.selected()"
+    [saving]="editor.busy()"
+    [errorMessage]="editor.error()"
+    (save)="editor.save($event)"
+    (cancel)="editor.close()"
+  />
+}
+@if (editor.mode() === 'delete') {
+  <app-confirm-delete-modal
+    title="Supprimer ce stockage ?"
+    description="Les produits qu’il contient seront également supprimés. Cette action est irréversible."
+    [itemName]="editor.selected()?.name ?? ''"
+    [deleting]="editor.busy()"
+    [errorMessage]="editor.error()"
+    (confirm)="editor.delete()"
+    (cancel)="editor.close()"
+  />
+}

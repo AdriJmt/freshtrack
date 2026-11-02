@@ -1,0 +1,16 @@
+@use "styles/abstracts/variables" as v;
+:host { display: grid; place-items: center; min-height: calc(100dvh - 48px); }
+.session-state {
+  width: min(440px,100%); padding: v.$spacing-xl v.$spacing-lg; border: 1px solid v.$color-border; border-radius: v.$radius-lg; background: v.$color-surface; box-shadow: 0 16px 48px rgba(v.$color-text,.06); text-align: center;
+  &__brand { color: v.$color-text-muted; font-size: v.$font-size-xs; font-weight: 600; letter-spacing: .05em; }
+  &__icon { display: grid; place-items: center; width: 72px; height: 72px; margin: v.$spacing-xl auto v.$spacing-lg; border-radius: 50%; background: v.$color-primary-light; color: v.$color-primary; svg { width: 38px; height: 38px; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } }
+  h1 { margin: 0 0 v.$spacing-sm; color: v.$color-text; font-size: v.$font-size-xl; line-height: 1.3; }
+  p { margin: 0; color: v.$color-text-muted; font-size: v.$font-size-base; line-height: 1.7; }
+  &__instruction { margin: v.$spacing-lg 0; padding: v.$spacing-md; border-radius: v.$radius-md; background: v.$color-background; text-align: left; strong { display: block; margin-bottom: v.$spacing-xs; color: v.$color-text; font-size: v.$font-size-base; } p { font-size: v.$font-size-sm; } }
+  &__hint { font-size: v.$font-size-sm !important; }
+  &--expired .session-state__icon { color: v.$color-warning; background: v.$color-warning-background; }
+  &--error .session-state__icon { color: v.$color-danger; background: rgba(v.$color-danger,.08); }
+  &__error { color: v.$color-danger !important; }
+  button { margin-top: v.$spacing-lg; min-height: v.$button-height-sm; font-size: v.$font-size-sm; padding: v.$spacing-sm v.$spacing-md; }
+}
+@media (max-width: v.$breakpoint-small) { .session-state { padding: v.$spacing-lg; } }

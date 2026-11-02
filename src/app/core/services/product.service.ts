@@ -1,31 +1,60 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { CreateProduct, Product, UpdateProduct } from '../models/product.model';
+import { ProductDto, ProductLookupDto } from '../api/models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  async getAll(): Promise<Product[]> {
-    return [];
+  private readonly apiUrl = `${environment.apiUrl}/storages`;
+  private readonly productLookupUrl = `${environment.apiUrl}/products/lookup`;
+
+  constructor(private readonly http: HttpClient) {}
+
+  getProductsFromStorage(storageId: string): Observable<ProductDto[]> {
+    return this.http.get<ProductDto[]>(`${this.apiUrl}/${storageId}/products`, {
+      withCredentials: true,
+    });
   }
 
-  async getById(_id: string): Promise<Product | null> {
-    return null;
+  createProducts(storageId: string, products: ProductDto[]): Observable<void> {
+    return this.http.post<void>(
+      `${this.apiUrl}/${storageId}/products`,
+      products,
+      { withCredentials: true },
+    );
   }
 
-  async createMany(
-    _storageId: string,
-    _products: CreateProduct[],
-  ): Promise<Product[]> {
-    return [];
+  updateProduct(
+    storageId: string,
+    productId: string,
+    product: ProductDto,
+  ): Observable<void> {
+    return this.http.put<void>(
+      `${this.apiUrl}/${storageId}/products/${productId}`,
+      product,
+      { withCredentials: true },
+    );
   }
 
-  async update(_id: string, _changes: UpdateProduct): Promise<Product> {
-    throw new Error('ProductService temporairement indisponible.');
+  deleteProduct(storageId: string, productId: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiUrl}/${storageId}/products/${productId}`,
+      { withCredentials: true },
+    );
   }
 
-  async delete(_id: string): Promise<void> {
-    return;
+  consumeProduct(storageId: string, productId: string, quantity: number): Observable<ProductDto> {
+    return this.http.post<ProductDto>(`${this.apiUrl}/${storageId}/products/${productId}/consume`, { quantity }, { withCredentials: true });
+  }
+
+  lookupByBarcode(barcode: string): Observable<ProductLookupDto> {
+    return this.http.get<ProductLookupDto>(
+      `${this.productLookupUrl}/${encodeURIComponent(barcode)}`,
+      { withCredentials: true },
+    );
   }
 }

@@ -1,0 +1,38 @@
+<div class="camera-scanner" (pointerdown)="feedback.enable()" [attr.aria-busy]="starting() || analyzing() || readingPhoto()">
+  <video #video autoplay muted playsinline [hidden]="!!errorMessage() || !!detectedCode()"></video>
+  @if (detectedCode()) {
+    <div class="camera-scanner__confirmation camera-scanner__target--detected"><span aria-hidden="true">✓</span><strong>Code-barres lu</strong><small>{{ detectedCode() }}</small></div>
+  }
+  @if (!errorMessage()) {
+    @if (!detectedCode()) {
+    <div class="camera-scanner__target" [class.camera-scanner__target--detected]="!!detectedCode()"
+      [style.left.%]="frame().left" [style.top.%]="frame().top" [style.width.%]="frame().width" [style.height.%]="frame().height" aria-hidden="true">
+      @if (!detectedCode() && !starting()) { <span class="camera-scanner__line"></span> }
+    </div>
+    }
+    <div class="camera-scanner__status" role="status" aria-live="polite">
+      @if (starting() || analyzing() || readingPhoto()) { <span class="camera-scanner__spinner" aria-hidden="true"></span> }
+      @if (starting()) { Ouverture de la caméra… }
+      @else if (analyzing()) { Code détecté · Analyse du produit… }
+      @else if (detectedCode()) { Code-barres détecté }
+      @else { <span class="camera-scanner__active" aria-hidden="true"></span>{{ readingStatus() }} }
+      @if (detectedCode()) { <small>{{ detectedCode() }}</small> }
+    </div>
+  }
+  @if (errorMessage()) {
+    <div class="camera-scanner__error">
+      <p role="alert">{{ errorMessage() }}</p>
+      @if (secureContext) {
+        <button type="button" class="button button--primary" [disabled]="starting()" (click)="start()">Réessayer la caméra</button>
+      }
+    </div>
+  }
+</div>
+@if (!detectedCode()) {
+  <details class="camera-diagnostic"><summary>État du lecteur</summary><p>Version : {{ readerVersion }}</p><p>{{ cameraName() }}</p><p>Flux vidéo : {{ videoSize() }}</p><p>Images analysées : {{ framesAnalyzed() }}</p><p>{{ decoding() ? 'Analyse en cours' : 'En attente de la prochaine image' }}</p></details>
+  <div class="camera-photo" (pointerdown)="feedback.enable()">
+    <label for="barcode-photo">Ou photographier le code-barres</label>
+    <input id="barcode-photo" type="file" accept="image/*" capture="environment" [disabled]="readingPhoto() || analyzing()" (change)="readPhoto($event)" />
+    @if (readingPhoto()) { <p role="status">Lecture du code-barres…</p> }
+  </div>
+}

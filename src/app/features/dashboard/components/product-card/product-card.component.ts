@@ -1,63 +1,25 @@
-import { Component, input, output, signal } from '@angular/core';
-
-import { Product } from '../../../../core/models/product.model';
+import { remainingQuantity } from '../../../inventory/utils/product-quantity';
+import { Component, computed, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ProductDto } from '../../../../core/api/models';
+import { ProductImageComponent } from '../../../../shared/ui/product-image/product-image.component';
+import { expiryInfo } from '../../../inventory/utils/product-expiry';
 
 @Component({
   selector: 'app-product-card',
-  imports: [],
+  imports: [ProductImageComponent, RouterLink],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss',
 })
 export class ProductCardComponent {
-  readonly product = input.required<Product>();
+  readonly product = input.required<ProductDto>();
   readonly storageName = input.required<string>();
-
-  readonly edit = output<Product>();
-  readonly delete = output<Product>();
-
-  readonly isMenuOpen = signal(false);
-
-  get expiryStatus(): 'expired' | 'soon' | 'normal' {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const expiryDate = new Date(`${this.product().expiry_date}T00:00:00`);
-    const difference = Math.ceil(
-      (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
-    );
-
-    if (difference < 0) {
-      return 'expired';
-    }
-
-    if (difference <= 3) {
-      return 'soon';
-    }
-
-    return 'normal';
-  }
-
-  get expiryLabel(): string {
-    const date = new Date(`${this.product().expiry_date}T00:00:00`);
-
-    return new Intl.DateTimeFormat('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    }).format(date);
-  }
-
-  toggleMenu(): void {
-    this.isMenuOpen.update((open) => !open);
-  }
-
-  editProduct(): void {
-    this.isMenuOpen.set(false);
-    this.edit.emit(this.product());
-  }
-
-  deleteProduct(): void {
-    this.isMenuOpen.set(false);
-    this.delete.emit(this.product());
-  }
+  readonly history = input(false);
+  readonly editable = input(true);
+  readonly remaining = computed(() => remainingQuantity(this.product()));
+  readonly shownQuantity = computed(() => this.history() ? this.product().consumedQuantity ?? 0 : this.remaining());
+  readonly consume = output<ProductDto>();
+  readonly edit = output<ProductDto>();
+  readonly delete = output<ProductDto>();
+  readonly expiry = computed(() => expiryInfo(this.product().expiryDate));
 }

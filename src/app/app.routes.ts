@@ -23,6 +23,23 @@ export const routes: Routes = [
       ),
   },
 
+  {
+    path: 'confirmation-inscription',
+    title: 'Confirmer votre adresse e-mail | FreshTrack',
+    loadComponent: () =>
+      import('./features/auth/pages/email-verification/email-verification.component').then(
+        (m) => m.EmailVerificationComponent,
+      ),
+  },
+  {
+    path: 'scan',
+    title: 'Scanner un produit | FreshTrack',
+    loadComponent: () =>
+      import('./features/inventory/pages/scan/scan-page.component').then(
+        (m) => m.ScanPageComponent,
+      ),
+  },
+
   // Application
   {
     path: '',
@@ -47,6 +64,14 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/pages/products/products.component').then(
             (m) => m.ProductsComponent,
+          ),
+      },
+      {
+        path: 'compte',
+        title: 'Mon compte | FreshTrack',
+        loadComponent: () =>
+          import('./features/account/pages/account/account.component').then(
+            (m) => m.AccountComponent,
           ),
       },
       {

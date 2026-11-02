@@ -1,12 +1,26 @@
-<section class="expiring-widget">
-    <div class="expiring-widget__heading">
-        <div>
-            <h2>À consommer bientôt</h2>
-            <p>Ne laissez rien se perdre.</p>
-        </div>
+<section>
+  <div class="workspace__section">
+    <div>
+      <h2>À surveiller en priorité</h2>
+      <p>Les dates les plus proches, tous stockages confondus.</p>
     </div>
-
-    <div class="expiring-widget__empty">
-        <p>Aucun produit à signaler.</p>
+    <a routerLink="/produits">Tous les produits →</a>
+  </div>
+  @if (priority().length) {
+    <div class="workspace__grid">
+      @for (product of priority(); track product.id) {
+        <app-product-card
+          [product]="product"
+          [storageName]="storageNames().get(product.storageId) ?? 'Stockage'"
+          [editable]="false"
+        />
+      }
     </div>
+  } @else {
+    <div class="workspace__empty">
+      <h3>Tout est à jour</h3>
+      <p>Aucune date dépassée ou prévue dans les trois prochains jours.</p>
+      <a class="action" routerLink="/produits">Parcourir mes produits</a>
+    </div>
+  }
 </section>

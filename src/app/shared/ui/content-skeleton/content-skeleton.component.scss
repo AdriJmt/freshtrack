@@ -1,0 +1,17 @@
+@use "styles/abstracts/variables" as v;
+:host { display: block; min-width: 0; width: 100%; }
+.skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(min(280px,100%),1fr)); gap: v.$spacing-md; }
+.skeleton-card { padding: v.$spacing-md; border: 1px solid v.$color-border; border-radius: v.$radius-md; background: v.$color-surface; min-width: 0; }
+.skeleton-top { display: flex; gap: v.$spacing-md; align-items: center; margin-bottom: v.$spacing-md; min-height: 86px; > div { flex: 1; min-width: 0; } }
+.block { position: relative; overflow: hidden; display: block; background: v.$color-primary-light; border-radius: v.$radius-sm; margin-bottom: v.$spacing-sm; height: 12px;
+  &::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg,transparent,rgba(v.$color-surface,.7),transparent); animation: shimmer 1.5s ease-in-out infinite; } }
+.title { width: 85%; height: 16px; } .line { width: 90%; } .short { width: 45%; } .number { height: 34px; width: 48px; margin: v.$spacing-md 0; }
+.image { width: 64px; height: 72px; flex-shrink: 0; } .icon { width: 44px; height: 44px; flex-shrink: 0; } .date { height: 30px; width: 100%; } .button { width: 80px; height: 24px; } .field { height: v.$input-height; margin-top: v.$spacing-md; }
+.skeleton-footer { display: flex; justify-content: space-between; align-items: center; gap: v.$spacing-md; padding-top: v.$spacing-sm; border-top: 1px solid v.$color-border; .block { margin: 0; } }
+.skeleton-card--storage { padding: v.$spacing-lg; border-radius: v.$radius-lg; background: v.$color-storage-fridge; .skeleton-top { min-height: 44px; } &:nth-child(even) { background: v.$color-storage-cupboard; } .skeleton-footer { margin-top: v.$spacing-lg; } }
+.skeleton-card--stats { min-height: 140px; padding: v.$spacing-lg; border-radius: v.$radius-lg; }
+.skeleton-card--account { padding: v.$spacing-lg; border-radius: v.$radius-lg; min-height: 380px; }
+.skeleton-grid--stats { grid-template-columns: repeat(5,minmax(0,1fr)); } .skeleton-grid--account { max-width: 1060px; grid-template-columns: 1fr 1fr; gap: v.$spacing-lg; } .skeleton-grid--single { grid-template-columns: 1fr; }
+@keyframes shimmer { to { transform: translateX(100%); } }
+@media(max-width: v.$breakpoint-tablet) { .skeleton-grid--stats { grid-template-columns: 1fr 1fr; } .skeleton-grid--account { grid-template-columns: 1fr; } }
+@media(prefers-reduced-motion: reduce) { .block::after { animation: none; } }

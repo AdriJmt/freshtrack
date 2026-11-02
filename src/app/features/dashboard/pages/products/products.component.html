@@ -1,92 +1,147 @@
-<div class="products-page">
-    <section class="products-page__heading">
-        <div>
-            <h1>Mes produits</h1>
-            <p>Retrouvez et gérez tous les aliments que vous avez enregistrés.</p>
-        </div>
-
-        <button class="products-page__add-button" type="button" [disabled]="storages().length === 0 && !isLoading()"
-            (click)="openAddModal()">
-            <span aria-hidden="true">+</span>
-            Ajouter un produit
-        </button>
-    </section>
-
-    <section class="products-page__filters">
-        <div class="products-page__search">
-            <input type="search" placeholder="Rechercher un produit..." aria-label="Rechercher un produit"
-                [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" />
-        </div>
-
-        <select aria-label="Filtrer par stockage" [value]="selectedStorageId()"
-            (change)="selectedStorageId.set($any($event.target).value)">
-            <option value="all">Tous les stockages</option>
-
-            @for (storage of storages(); track storage.id) {
-            <option [value]="storage.id">
-                {{ storage.name }}
-            </option>
-            }
-        </select>
-
-        <select aria-label="Filtrer par type de péremption" [value]="selectedExpiryType()"
-            (change)="selectedExpiryType.set($any($event.target).value)">
-            <option value="all">Toutes les dates</option>
-            <option value="DLC">DLC</option>
-            <option value="DDM">DDM</option>
-        </select>
-
-        <select aria-label="Filtrer par état de péremption" [value]="selectedExpiryFilter()"
-            (change)="selectedExpiryFilter.set($any($event.target).value)">
-            <option value="all">Tous les états</option>
-            <option value="expired">Expirés</option>
-            <option value="soon">Bientôt périmés</option>
-            <option value="normal">À jour</option>
-        </select>
-    </section>
-
-    @if (errorMessage(); as error) {
-    <div class="products-page__error" role="alert">
-        {{ error }}
+<div class="workspace">
+  @if (storageId() !== 'all') {
+    <a class="workspace__back" routerLink="/stockages">← Mes stockages</a>
+  }
+  <header class="workspace__heading">
+    <div>
+      <h1>
+        {{
+          storageId() === 'all'
+            ? 'Mes produits'
+            : (selectedStorage()?.name ?? 'Contenu du stockage')
+        }}
+      </h1>
+      <p>
+        {{
+          storageId() === 'all'
+            ? 'Retrouvez vos aliments, des dates les plus proches aux plus lointaines.'
+            : 'Tous les produits de cet espace, triés par date de péremption.'
+        }}
+      </p>
     </div>
-    }
-
-    <section class="products-page__content">
-        @if (isLoading()) {
-        <div class="products-page__state">
-            Chargement des produits...
-        </div>
-        } @else if (filteredProducts().length === 0) {
-        <div class="products-page__empty">
-            <h2>Aucun résultat</h2>
-            <p>
-                Aucun produit ne correspond à tes critères de recherche.
-            </p>
-        </div>
-        } @else {
-        <div class="products-page__results">
-            <span>
-                {{ filteredProducts().length }}
-                produit(s)
-            </span>
-        </div>
-
-        <div class="products-page__grid">
-            @for (product of filteredProducts(); track product.id) {
-            <app-product-card [product]="product"
-                [storageName]="storageNames().get(product.storage_id) ?? 'Stockage inconnu'"
-                (edit)="openEditModal($event)" (delete)="openDeleteModal($event)" />
-            }
-        </div>
+    <button
+      class="action action--primary"
+      [disabled]="inventory.loading() || !inventory.storages().length"
+      (click)="adding.set(true)"
+    >
+      ＋ Ajouter un produit
+    </button>
+  </header>
+  <section
+    class="workspace__filters"
+    aria-label="Rechercher et filtrer les produits"
+  >
+    <label
+      >Rechercher<input
+        type="search"
+        placeholder="Nom ou code-barres…"
+        [value]="search()"
+        (input)="search.set($any($event.target).value)"
+    /></label>
+    <label
+      >Stockage<app-select
+        label="Filtrer par stockage"
+        [options]="storageOptions()"
+        [value]="storageId()"
+        (valueChange)="filter('stockage', $event)"
+    /></label>
+    <label
+      >Péremption<app-select
+        label="Filtrer par péremption"
+        [options]="expiryOptions"
+        [value]="expiry()"
+        (valueChange)="filter('etat', $event)"
+    /></label>
+  </section>
+  @if (inventory.error()) {
+    <div class="workspace__error" role="alert">
+      {{ inventory.error()
+      }}<button class="action" (click)="inventory.load(true)">Réessayer</button>
+    </div>
+  }
+  @if (inventory.loading()) {
+    <app-content-skeleton label="Chargement des produits" [count]="6" />
+  } @else if (!inventory.error()) {
+    <div class="workspace__results">
+      <span
+        >{{ filtered().length }} références · {{ quantity() }} articles</span
+      >
+      <button class="action" type="button" (click)="inventory.load(true)">
+        Actualiser
+      </button>
+      @if (search() || storageId() !== 'all' || expiry() !== 'all') {
+        <button class="action" (click)="reset()">Effacer les filtres</button>
+      }
+    </div>
+    @if (filtered().length) {
+      <div class="workspace__grid">
+        @for (product of filtered(); track product.id) {
+          <app-product-card
+            [product]="product" [history]="expiry() === 'consumed'"
+            [storageName]="
+              inventory.storageNames().get(product.storageId) ?? 'Stockage'
+            "
+            (consume)="open($event, 'consume')"
+            (edit)="open($event, 'edit')"
+            (delete)="open($event, 'delete')"
+          />
         }
-    </section>
+      </div>
+    } @else {
+      <div class="workspace__empty">
+        <h2>
+          {{
+            inventory.products().length
+              ? 'Aucun produit ne correspond'
+              : 'Vos premières réserves commencent ici'
+          }}
+        </h2>
+        <p>
+          {{
+            inventory.products().length
+              ? 'Essayez un autre nom ou élargissez vos filtres.'
+              : 'Ajoutez vos aliments pour retrouver ici leurs quantités et leurs dates.'
+          }}
+        </p>
+        @if (!inventory.storages().length) {
+          <a class="action action--primary" routerLink="/stockages"
+            >Créer un stockage</a
+          >
+        } @else if (!inventory.products().length) {
+          <button class="action action--primary" (click)="adding.set(true)">
+            Ajouter un produit
+          </button>
+        }
+      </div>
+    }
+  }
 </div>
-
-@if (isAddModalOpen()) {
-<app-product-add-modal [storages]="storages()" (cancel)="closeAddModal()" (productsAdded)="loadData()" />
+@if (adding()) {
+  <app-product-add-modal
+    [storages]="inventory.storages()"
+    [initialStorageId]="selectedStorage()?.id ?? ''"
+    (cancel)="adding.set(false)"
+    (productsAdded)="inventory.load(true)"
+  />
+}
+@if (mode() === 'edit') {
+  <app-product-form-modal
+    [product]="selected()"
+    [storages]="inventory.storages()"
+    [saving]="busy()"
+    [errorMessage]="error()"
+    (save)="save($event)"
+    (cancel)="close()"
+  />
+}
+@if (mode() === 'delete') {
+  <app-confirm-delete-modal
+    [itemName]="selected()?.name ?? 'ce produit'"
+    [deleting]="busy()"
+    [errorMessage]="error()"
+    (confirm)="delete()"
+    (cancel)="close()"
+  />
 }
 
-@if (isDeleteModalOpen() && selectedProduct()) {
-<app-confirm-delete-modal [itemName]="selectedProduct()!.name" [deleting]="isDeleting()" [errorMessage]="errorMessage()"
-    (confirm)="confirmDelete()" (cancel)="closeDeleteModal()" />
-}
+@if (mode() === 'consume' && selected()) { <app-consume-product-modal [product]="selected()!" [busy]="busy()" [error]="error()" (cancel)="close()" (confirm)="consume($event)" /> }

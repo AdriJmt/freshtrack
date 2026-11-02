@@ -1,4 +1,4 @@
-@use "styles/abstracts/variables" as vars;
+@use 'styles/abstracts/variables' as vars;
 
 :host {
   display: block;
@@ -229,4 +229,15 @@
   margin: vars.$spacing-sm;
   color: vars.$color-danger;
   font-size: vars.$font-size-xs;
+}
+
+.dashboard-navbar__account-link {
+  display: block;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  color: inherit;
+  text-decoration: none;
+  font-size: vars.$font-size-base;
+  &:hover {
+    text-decoration: underline;
+  }
 }

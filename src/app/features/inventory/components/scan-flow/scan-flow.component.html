@@ -1,0 +1,56 @@
+<section>
+  @if (showHeader()) { <header><h2 id="scan-modal-title">Ajouter par scan</h2><button class="scan-close" type="button" aria-label="Fermer le scan" (click)="cancel.emit()">&times;</button></header> }
+  <ol class="scan-progress" aria-label="Étapes de l’ajout">
+    <li [class.is-active]="step() === 'barcode' || step() === 'confirm-barcode' || step() === 'lookup'" [class.is-done]="step() !== 'barcode' && step() !== 'confirm-barcode' && step() !== 'lookup'">1 <span>Code-barres</span></li>
+    <li [class.is-active]="step() === 'date'" [class.is-done]="step() === 'review' || step() === 'success'">2 <span>Péremption</span></li>
+    <li [class.is-active]="step() === 'review' || step() === 'success'">3 <span>Vérification</span></li>
+  </ol>
+  @if ((step() === 'date' || step() === 'review') && barcode) {
+    <div class="scan-product"><app-product-image [source]="imageUrl" [name]="name || 'Produit scanné'" /><div><strong>{{ name || 'Produit à compléter' }}</strong><small>{{ barcode }}</small></div></div>
+  }
+  @if (!storages().length) {
+    <p role="alert">Créez d’abord un stockage pour ajouter vos produits.</p>
+  } @else if (step() === 'barcode') {
+    <p>1 / 3 · Scannez le code-barres</p>
+    <app-camera-scanner (barcodeDetected)="detected($event)" />
+    @if (step() === 'barcode') {
+    <details class="scan-manual"><summary>Saisir le code-barres</summary>
+    <form (ngSubmit)="detected(barcode)">
+      <label for="scan-barcode">Code-barres</label>
+      <input id="scan-barcode" name="barcode" [(ngModel)]="barcode" inputmode="numeric" pattern="[0-9]{8,14}" required />
+      <button class="button button--primary" [disabled]="!barcode.trim() || busy()">Vérifier ce code</button>
+    </form></details>
+    }
+  } @else if (step() === 'confirm-barcode') {
+    <form class="scan-confirmation" (ngSubmit)="confirmBarcode()">
+      <span class="scan-confirmation__check" aria-hidden="true">✓</span>
+      <h3>Ce code-barres est-il correct ?</h3>
+      <label for="confirmed-barcode">Code détecté · modifiable</label>
+      <input id="confirmed-barcode" name="confirmedBarcode" [(ngModel)]="barcode" inputmode="numeric" pattern="[0-9]{8,14}" minlength="8" maxlength="14" required />
+      <footer class="modal-footer"><button type="button" (click)="rescanBarcode()">Rescanner</button><button class="button button--primary" type="submit" [disabled]="!canConfirmBarcode()">Confirmer le code</button></footer>
+    </form>
+  } @else if (step() === 'lookup') {
+    <p role="status">Recherche du produit associé au code {{ barcode }}…</p>
+    <footer class="modal-footer"><button type="button" (click)="rescanBarcode()">Annuler et rescanner</button></footer>
+  } @else if (step() === 'date') {
+    <p class="scan-step">2 / 3 · Scannez la date de péremption</p>
+    <button class="scan-link" type="button" (click)="rescanBarcode()">← Revenir au code-barres</button>
+    <app-expiry-date-reader (dateDetected)="onDateDetected($event)" (skip)="step.set('review')" />
+  } @else if (step() === 'review') {
+    <p>3 / 3 · Vérifiez les informations et le stockage</p>
+    <fieldset [disabled]="busy()">
+      <label for="scan-name">Nom du produit</label><input id="scan-name" [(ngModel)]="name" required />
+      <label for="scan-code">Code-barres</label><input id="scan-code" [(ngModel)]="barcode" inputmode="numeric" />
+      <div class="scan-date-label"><label for="scan-expiry">Date de péremption</label><button class="scan-link" type="button" (click)="backToDate()">Rescanner</button></div><input id="scan-expiry" type="date" [(ngModel)]="expiryDate" required />
+      <label for="scan-quantity">Quantité</label><input id="scan-quantity" type="number" min="1" max="2147483647" step="1" inputmode="numeric" [(ngModel)]="quantity" required />
+      <label for="scan-storage">Stockage</label>
+      <app-select controlId="scan-storage" label="Stockage du produit" [options]="storageOptions()" [value]="storageId" (valueChange)="storageId = $event" [disabled]="busy()" />
+      <footer class="modal-footer"><button type="button" (click)="rescanBarcode()">Rescanner le code-barres</button><button type="button" (click)="backToDate()">Retour à la date</button><button class="button button--primary" type="button" [disabled]="!valid() || busy()" (click)="save()">{{ busy() ? 'Enregistrement…' : 'Valider et ranger' }}</button></footer>
+    </fieldset>
+  } @else {
+    <p role="status">Produit ajouté dans le stockage sélectionné.</p>
+    <button class="button button--primary" type="button" (click)="next()">Scanner un autre produit</button>
+  }
+  @if (errorMessage()) { <p class="scan-error" role="alert">{{ errorMessage() }}</p> }
+  @if (message()) { <p role="status" aria-live="polite">{{ message() }}</p> }
+</section>

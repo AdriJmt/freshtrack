@@ -20,19 +20,30 @@
             "outputPath": "dist/freshtrack",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "stylePreprocessorOptions": {
-              "includePaths": ["src"]
+              "includePaths": [
+                "src"
+              ]
             },
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "zxing_reader.wasm",
+                "input": "node_modules/zxing-wasm/dist/reader",
+                "output": "assets/scanner"
               }
             ],
-            "styles": ["src/styles/main.scss"],
+            "styles": [
+              "src/styles/main.scss"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -75,7 +86,11 @@
               "buildTarget": "freshtrack:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "host": "0.0.0.0",
+            "proxyConfig": "proxy.conf.json"
+          }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
@@ -83,17 +98,59 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": ["zone.js", "zone.js/testing"],
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "zxing_reader.wasm",
+                "input": "node_modules/zxing-wasm/dist/reader",
+                "output": "assets/scanner"
+              },
+              {
+                "glob": "**/*.jpg",
+                "input": "src/testing/fixtures",
+                "output": "test-fixtures"
               }
             ],
-            "styles": ["src/styles.scss"],
-            "scripts": []
+            "styles": [
+              "src/styles/main.scss"
+            ],
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src"
+              ]
+            }
+          },
+          "configurations": {
+            "scan": {
+              "tsConfig": "tsconfig.scan-spec.json",
+              "include": [
+                "src/app/features/inventory/**/*.spec.ts",
+                "src/app/shared/ui/select/**/*.spec.ts"
+              ]
+            },
+            "workspace": {
+              "tsConfig": "tsconfig.workspace-spec.json",
+              "include": [
+                "src/app/features/inventory/**/*.spec.ts",
+                "src/app/shared/ui/select/**/*.spec.ts",
+                "src/app/shared/ui/modal/**/*.spec.ts",
+                "src/app/features/dashboard/components/dashboard-stats/**/*.spec.ts",
+                "src/app/features/dashboard/pages/products/**/*.spec.ts",
+                "src/app/features/auth/components/register-form/**/*.spec.ts",
+                "src/app/features/account/**/*.spec.ts",
+                "src/app/shared/utils/**/*.spec.ts"
+              ]
+            }
           }
         }
       }

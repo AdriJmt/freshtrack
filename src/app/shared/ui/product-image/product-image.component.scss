@@ -1,0 +1,9 @@
+@use "styles/abstracts/variables" as v;
+:host { display: block; flex-shrink: 0; width: 64px; height: 72px; }
+.product-image { display: grid; place-items: center; width: 100%; height: 100%; border: 1px solid v.$color-border; border-radius: v.$radius-md; background: v.$color-background; overflow: hidden; padding: v.$spacing-xs;
+ img { width: 100%; height: 100%; object-fit: contain; }
+ svg { width: 28px; height: 28px; stroke: v.$color-text-muted; stroke-width: 1.3; }
+ &--loading { animation: image-pulse 1.4s ease-in-out infinite; }
+}
+@keyframes image-pulse { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .product-image--loading { animation: none; } }

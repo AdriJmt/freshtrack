@@ -1,35 +1,64 @@
-<article class="storage-card" [class.storage-card--fridge]="storage().type === 'fridge'"
-    [class.storage-card--cupboard]="storage().type === 'cupboard'">
-    <div class="storage-card__header">
-        <div class="storage-card__icon" aria-hidden="true">
-            {{ storage().type === 'fridge' ? '❄' : '▤' }}
-        </div>
-
-        <div class="storage-card__menu">
-            <button class="storage-card__menu-trigger" type="button" aria-label="Options du stockage"
-                aria-haspopup="true" [attr.aria-expanded]="isMenuOpen()" (click)="toggleMenu()">
-                <span aria-hidden="true">•••</span>
-            </button>
-
-            @if (isMenuOpen()) {
-            <div class="storage-card__popover" role="menu">
-                <button type="button" role="menuitem" (click)="editStorage()">
-                    Modifier
-                </button>
-
-                <button class="storage-card__delete" type="button" role="menuitem" (click)="deleteStorage()">
-                    Supprimer
-                </button>
-            </div>
-            }
-        </div>
+<article
+  class="storage-card"
+  [class.storage-card--cupboard]="storage().type === 'CUPBOARD'"
+>
+  <a
+    class="storage-card__link"
+    routerLink="/produits"
+    [queryParams]="{ stockage: storage().id }"
+    [attr.aria-label]="'Voir le contenu de ' + storage().name"
+  >
+    <div class="storage-card__heading">
+      <span class="storage-card__icon" aria-hidden="true">{{
+        storage().type === 'FRIDGE' ? '❄' : '▤'
+      }}</span>
+      <div>
+        <small>{{
+          storage().type === 'FRIDGE' ? 'Réfrigérateur' : 'Placard'
+        }}</small>
+        <h3>{{ storage().name }}</h3>
+      </div>
+      <span aria-hidden="true">↗</span>
     </div>
-
-    <div class="storage-card__body">
-        <span class="storage-card__type">
-            {{ storage().type === 'fridge' ? 'Frigo' : 'Placard' }}
-        </span>
-
-        <h2>{{ storage().name }}</h2>
+    <div class="storage-card__count">
+      <strong>{{ summary()?.quantity ?? 0 }}</strong> articles
+      <span>· {{ summary()?.references ?? 0 }} références</span>
     </div>
+    <p class="storage-card__preview">
+      @for (
+        product of summary()?.preview ?? [];
+        track product.id;
+        let last = $last
+      ) {
+        {{ product.name }}{{ last ? '' : ', ' }}
+      } @empty {
+        Ce stockage est prêt à accueillir vos produits.
+      }
+    </p>
+    @if (summary()?.urgent) {
+      <span class="storage-card__alert"
+        >{{ summary()!.urgent }} référence(s) à surveiller</span
+      >
+    }
+  </a>
+  <footer>
+    <a routerLink="/produits" [queryParams]="{ stockage: storage().id }"
+      >Voir le contenu →</a
+    >
+    <div>
+      <button
+        type="button"
+        (click)="edit.emit(storage())"
+        [attr.aria-label]="'Renommer ' + storage().name"
+      >
+        Renommer</button
+      ><button
+        type="button"
+        (click)="delete.emit(storage())"
+        [attr.aria-label]="'Supprimer ' + storage().name"
+      >
+        Supprimer
+      </button>
+    </div>
+  </footer>
 </article>

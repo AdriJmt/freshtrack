@@ -1,4 +1,4 @@
-@use "styles/abstracts/variables" as vars;
+@use 'styles/abstracts/variables' as vars;
 
 :host {
   display: block;
@@ -94,7 +94,7 @@
       cursor: pointer;
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       width: 15px;
       height: 15px;
       margin: 0;

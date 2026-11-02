@@ -1,3 +1,4 @@
+import { provideAppTesting } from '../../../../../testing/test-providers';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { StoragesComponent } from './storages.component';
@@ -8,6 +9,7 @@ describe('StoragesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: provideAppTesting(),
       imports: [StoragesComponent]
     })
     .compileComponents();

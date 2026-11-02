@@ -1,0 +1,11 @@
+<main class="scan-page">
+  @if (state(); as terminalState) {
+    <app-scan-session-state [kind]="terminalState" />
+  } @else if (loading()) {
+    <p class="scan-page__loading" role="status">Préparation de votre session de scan…</p>
+  } @else if (error()) {
+    <app-scan-session-state kind="error" [description]="error()" (retry)="load()" />
+  } @else {
+    <app-scan-flow [storages]="storages()" [scanToken]="scanToken" (sessionExpired)="onSessionExpired()" (cancel)="close()" />
+  }
+</main>

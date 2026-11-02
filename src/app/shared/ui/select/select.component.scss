@@ -1,0 +1,18 @@
+@use "styles/abstracts/variables" as v;
+:host { display: block; min-width: 0; width: 100%; font-size: v.$font-size-sm; }
+.select-trigger { display: flex; align-items: center; justify-content: space-between; gap: v.$spacing-sm; width: 100%; min-height: 42px; padding: v.$spacing-sm v.$spacing-md; border: 1px solid v.$color-border; border-radius: v.$radius-md; background: v.$color-surface; color: v.$color-text; font: inherit; text-align: left; cursor: pointer; transition: border-color .15s, box-shadow .15s;
+  > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  svg { flex-shrink: 0; width: 18px; height: 18px; fill: none; stroke: v.$color-text-muted; stroke-width: 1.5; transition: transform .15s; &.is-open { transform: rotate(180deg); } }
+  &:hover { border-color: v.$color-primary; }
+  &:focus-visible, &[aria-expanded='true'] { outline: none; border-color: v.$color-primary; box-shadow: 0 0 0 3px rgba(v.$color-primary,.1); }
+  &:disabled { opacity: .55; cursor: not-allowed; }
+}
+.select-placeholder { color: v.$color-text-muted; }
+.select-options { position: fixed; inset: auto; margin: 0; box-sizing: border-box; padding: v.$spacing-xs; border: 1px solid v.$color-border; border-radius: v.$radius-md; background: v.$color-surface; color: v.$color-text; box-shadow: 0 12px 32px rgba(v.$color-text,.14); overflow: auto; font-family: v.$font-family-base; font-size: v.$font-size-sm; }
+.select-option { display: flex; justify-content: space-between; align-items: center; gap: v.$spacing-sm; padding: v.$spacing-sm; border-radius: v.$radius-sm; cursor: pointer;
+  strong { display: block; font-weight: 500; line-height: 1.5; } small { display: block; margin-top: 2px; color: v.$color-text-muted; font-size: v.$font-size-xs; }
+  &.is-active, &[aria-selected='true'] { background: v.$color-primary-light; color: v.$color-primary; }
+  &[aria-disabled='true'] { opacity: .45; cursor: not-allowed; }
+}
+.select-check { color: v.$color-primary; }
+.select-empty { padding: v.$spacing-sm; color: v.$color-text-muted; }

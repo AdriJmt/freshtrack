@@ -1,0 +1,45 @@
+@use "styles/abstracts/variables" as vars;
+
+:host { display: block; font-size: vars.$font-size-sm; }
+.date-scanner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: vars.$radius-md;
+  background: vars.$color-text;
+  video, canvas { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  video[hidden], canvas[hidden] { display: none; }
+  &__frame {
+    position: absolute;
+    left: 8%; top: 38%; width: 84%; height: 24%;
+    border: 2px solid vars.$color-surface;
+    border-radius: vars.$radius-sm;
+    box-shadow: 0 0 0 100vmax rgba(vars.$color-text, .35);
+    pointer-events: none;
+    &--detected { border: 4px solid vars.$color-primary; outline: 1px solid vars.$color-surface; background: rgba(vars.$color-primary, .2); }
+  }
+  &__status {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: vars.$spacing-sm;
+    padding: vars.$spacing-sm vars.$spacing-md;
+    color: vars.$color-surface;
+    background: rgba(vars.$color-text, .85);
+    text-align: center;
+    strong { width: 100%; font-size: vars.$font-size-base; }
+  }
+  &__spinner { width: 14px; height: 14px; border: 2px solid vars.$color-auth-border; border-top-color: vars.$color-surface; border-radius: 50%; animation: date-spin .8s linear infinite; }
+  &__error { padding: vars.$spacing-md; color: vars.$color-text; background: vars.$color-primary-light; }
+  &__footer { display: flex; align-items: center; justify-content: flex-end; gap: vars.$spacing-sm; margin-top: vars.$spacing-sm; p { flex: 1; margin: 0; color: vars.$color-text-muted; line-height: 1.5; } }
+  &__footer button, &__error button { min-height: vars.$button-height-sm; padding: vars.$spacing-sm; border: 1px solid vars.$color-border; border-radius: vars.$radius-sm; color: vars.$color-primary; background: vars.$color-surface; font: inherit; cursor: pointer; white-space: nowrap; }
+}
+@keyframes date-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .date-scanner__spinner { animation: none; } }
+
+.date-scanner__confirmation { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px; gap: vars.$spacing-sm; background: vars.$color-primary-light; color: vars.$color-primary; span { font-size: 32px; } strong { font-size: vars.$font-size-base; } }
+
+.date-scanner__candidate { display: flex; align-items: center; justify-content: space-between; gap: vars.$spacing-sm; margin-top: vars.$spacing-sm; padding: vars.$spacing-sm vars.$spacing-md; border: 1px solid vars.$color-border; border-radius: vars.$radius-md; background: vars.$color-primary-light; color: vars.$color-primary; strong { display: block; margin-top: vars.$spacing-xs; font-variant-numeric: tabular-nums; } button { min-height: vars.$button-height-sm; padding: vars.$spacing-sm; border: 1px solid vars.$color-primary; border-radius: vars.$radius-sm; color: vars.$color-surface; background: vars.$color-primary; cursor: pointer; font: inherit; } }

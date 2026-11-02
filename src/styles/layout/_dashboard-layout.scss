@@ -6,7 +6,7 @@
 }
 
 .dashboard-layout__main {
-  width: min(vars.$container-max-width, 100%);
+  width: min(vars.$dashboard-content-max-width, 100%);
   margin-inline: auto;
   padding: vars.$spacing-xl;
 }

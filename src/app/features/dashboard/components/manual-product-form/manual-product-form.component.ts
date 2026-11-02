@@ -1,32 +1,35 @@
-import { Component, input, output, signal, OnInit } from '@angular/core';
+import {
+  ManualProductEntry,
+  ManualProductSubmission,
+} from '../../../inventory/types/product-form';
+import { SelectComponent } from '../../../../shared/ui/select/select.component';
+import { storageSelectOptions } from '../../../../shared/ui/select/select-options';
+import {
+  computed,
+  Component,
+  input,
+  output,
+  signal,
+  OnInit,
+} from '@angular/core';
 
-import { Storage } from '../../../../core/models/storage.model';
-import { CreateProduct } from '../../../../core/models/product.model';
-
-export interface ManualProductEntry {
-  id: number;
-  name: string;
-  barcode: string;
-  expiry_date: string;
-  expiry_type: 'DLC' | 'DDM';
-  package_size: number | null;
-  package_unit: string;
-}
-
-export interface ManualProductSubmission {
-  storage_id: string;
-  products: CreateProduct[];
-}
+import { ProductDto, StorageDto } from '../../../../core/api/models';
 
 @Component({
   selector: 'app-manual-product-form',
-  imports: [],
+  imports: [SelectComponent],
   templateUrl: './manual-product-form.component.html',
   styleUrl: './manual-product-form.component.scss',
 })
 export class ManualProductFormComponent implements OnInit {
-  readonly storages = input.required<Storage[]>();
+  readonly storageOptions = computed(() =>
+    storageSelectOptions(this.storages()),
+  );
+  readonly initialStorageId = input('');
+  readonly storages = input.required<StorageDto[]>();
 
+  readonly initialProduct = input<ProductDto | null>(null);
+  readonly saving = input(false);
   readonly save = output<ManualProductSubmission>();
   readonly cancel = output<void>();
 
@@ -39,10 +42,27 @@ export class ManualProductFormComponent implements OnInit {
   private nextProductId = 2;
 
   ngOnInit(): void {
+    const product = this.initialProduct();
+    if (product) {
+      this.selectedStorageId.set(product.storageId ?? '');
+      this.products.set([
+        {
+          id: 1,
+          name: product.name ?? '',
+          barcode: product.barcode ?? '',
+          expiryDate: product.expiryDate ?? '',
+          quantity: product.quantity ?? 1,
+        },
+      ]);
+      return;
+    }
     const firstStorage = this.storages()[0];
 
-    if (firstStorage) {
-      this.selectedStorageId.set(firstStorage.id);
+    const preferred = this.storages().find(
+      (storage) => storage.id === this.initialStorageId(),
+    );
+    if (preferred?.id || firstStorage?.id) {
+      this.selectedStorageId.set(preferred?.id ?? firstStorage!.id!);
     }
   }
 
@@ -77,31 +97,29 @@ export class ManualProductFormComponent implements OnInit {
       this.products().every(
         (product) =>
           product.name.trim().length > 0 &&
-          !!product.expiry_date &&
-          (product.expiry_type === 'DLC' || product.expiry_type === 'DDM') &&
-          (product.package_size === null ||
-            (Number.isFinite(product.package_size) &&
-              product.package_size >= 0)),
+          !!product.expiryDate &&
+          Number.isFinite(new Date(product.expiryDate).getTime()) &&
+          Number.isInteger(product.quantity) &&
+          product.quantity >= 1 &&
+          product.quantity <= 2147483647,
       )
     );
   }
 
   submit(): void {
-    if (!this.isFormValid()) {
+    if (this.saving() || !this.isFormValid()) {
       return;
     }
 
-    const products: CreateProduct[] = this.products().map((product) => ({
+    const products: ProductDto[] = this.products().map((product) => ({
       name: product.name.trim(),
-      barcode: product.barcode.trim() || null,
-      expiry_date: product.expiry_date,
-      expiry_type: product.expiry_type,
-      package_size: product.package_size,
-      package_unit: product.package_unit || null,
+      barcode: product.barcode.trim() || undefined,
+      expiryDate: product.expiryDate,
+      quantity: product.quantity,
     }));
 
     this.save.emit({
-      storage_id: this.selectedStorageId(),
+      storageId: this.selectedStorageId(),
       products,
     });
   }
@@ -111,10 +129,8 @@ export class ManualProductFormComponent implements OnInit {
       id,
       name: '',
       barcode: '',
-      expiry_date: '',
-      expiry_type: 'DLC',
-      package_size: null,
-      package_unit: '',
+      expiryDate: '',
+      quantity: 1,
     };
   }
 }

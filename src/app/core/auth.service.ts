@@ -40,6 +40,10 @@ export class AuthService {
 
   private csrfToken: string | null = null;
 
+  updateProfile(profile: Pick<AuthResponseDto, 'userId' | 'email' | 'displayName'>): void {
+    this.userState.set(profile);
+  }
+
   /**
    * Initialise l'authentification en essayant de récupérer
    * un nouvel access token à partir du cookie HttpOnly.

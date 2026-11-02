@@ -1,29 +1,41 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-
+import { ConsumeProductModalComponent } from '../../../inventory/components/consume-product-modal/consume-product-modal.component';
+import { remainingQuantity } from '../../../inventory/utils/product-quantity';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { firstValueFrom } from 'rxjs';
+import { ProductDto } from '../../../../core/api/models';
 import { ProductService } from '../../../../core/services/product.service';
-import { StorageService } from '../../../../core/services/storage.service';
-
+import { InventoryStore } from '../../../inventory/services/inventory-store.service';
+import { expiryInfo } from '../../../inventory/utils/product-expiry';
+import { SelectComponent } from '../../../../shared/ui/select/select.component';
 import {
-  CreateProduct,
-  Product,
-  UpdateProduct,
-} from '../../../../core/models/product.model';
-import { Storage } from '../../../../core/models/storage.model';
-
+  storageSelectOptions,
+  EXPIRY_FILTER_OPTIONS,
+} from '../../../../shared/ui/select/select-options';
+import { ContentSkeletonComponent } from '../../../../shared/ui/content-skeleton/content-skeleton.component';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { ProductFormModalComponent } from '../../components/product-form-modal/product-form-modal.component';
 import { ConfirmDeleteModalComponent } from '../../components/confirm-delete-modal/confirm-delete-modal.component';
-import {
-  ProductAddModalComponent,
-} from '../../components/product-add-modal/product-add-modal.component';
-import { ManualProductSubmission } from '../../components/manual-product-form/manual-product-form.component';
-
-type ExpiryFilter = 'all' | 'expired' | 'soon' | 'normal';
-type ExpiryTypeFilter = 'all' | 'DLC' | 'DDM';
+import { ProductAddModalComponent } from '../../components/product-add-modal/product-add-modal.component';
+import { ManualProductSubmission } from '../../../inventory/types/product-form';
 
 @Component({
   selector: 'app-products',
   imports: [
+    RouterLink,
+    ConsumeProductModalComponent,
+    SelectComponent,
+    ContentSkeletonComponent,
     ProductCardComponent,
+    ProductFormModalComponent,
     ConfirmDeleteModalComponent,
     ProductAddModalComponent,
   ],
@@ -31,216 +43,135 @@ type ExpiryTypeFilter = 'all' | 'DLC' | 'DDM';
   styleUrl: './products.component.scss',
 })
 export class ProductsComponent implements OnInit {
-  private readonly productService = inject(ProductService);
-  private readonly storageService = inject(StorageService);
-
-  readonly products = signal<Product[]>([]);
-  readonly storages = signal<Storage[]>([]);
-
-  readonly storageNames = computed(
-    () => new Map(this.storages().map((storage) => [storage.id, storage.name])),
+  readonly inventory = inject(InventoryStore);
+  private readonly api = inject(ProductService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  readonly search = signal('');
+  readonly storageId = signal('all');
+  readonly expiry = signal('all');
+  readonly adding = signal(false);
+  readonly selected = signal<ProductDto | null>(null);
+  readonly mode = signal<'edit' | 'delete' | 'consume' | null>(null);
+  readonly busy = signal(false);
+  readonly error = signal('');
+  readonly storageOptions = computed(() =>
+    storageSelectOptions(this.inventory.storages(), true),
+  );
+  readonly expiryOptions = EXPIRY_FILTER_OPTIONS;
+  readonly selectedStorage = computed(() =>
+    this.inventory
+      .storages()
+      .find((storage) => storage.id === this.storageId()),
+  );
+  readonly filtered = computed(() => {
+    const search = this.search().trim().toLocaleLowerCase('fr');
+    return this.inventory
+      .products()
+      .filter(
+        (product) =>
+          (!search ||
+            `${product.name ?? ''} ${product.barcode ?? ''}`
+              .toLocaleLowerCase('fr')
+              .includes(search)) &&
+          (this.storageId() === 'all' ||
+            product.storageId === this.storageId()) &&
+          (this.expiry() === 'consumed' ? (product.consumedQuantity ?? 0) > 0 : remainingQuantity(product) > 0 && (this.expiry() === 'all' || expiryInfo(product.expiryDate).status === this.expiry())),
+      )
+      .sort((a, b) =>
+        (a.expiryDate ?? '9999').localeCompare(b.expiryDate ?? '9999'),
+      );
+  });
+  readonly quantity = computed(() =>
+    this.filtered().reduce((sum, product) => sum + (this.expiry() === 'consumed' ? product.consumedQuantity ?? 0 : remainingQuantity(product)), 0),
   );
 
-  readonly isLoading = signal(true);
-  readonly isSaving = signal(false);
-  readonly isDeleting = signal(false);
-
-  readonly errorMessage = signal<string | null>(null);
-
-  readonly isFormModalOpen = signal(false);
-  readonly isDeleteModalOpen = signal(false);
-
-  readonly selectedProduct = signal<Product | null>(null);
-
-  readonly searchTerm = signal('');
-  readonly selectedStorageId = signal('all');
-  readonly selectedExpiryType = signal<ExpiryTypeFilter>('all');
-  readonly selectedExpiryFilter = signal<ExpiryFilter>('all');
-
   ngOnInit(): void {
-    void this.loadData();
+    // URL filters make statistics and storage cards directly navigable and shareable.
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.storageId.set(params.get('stockage') || 'all');
+        const expiry = params.get('etat') ?? 'all';
+        this.expiry.set(
+          ['soon', 'expired', 'normal', 'consumed'].includes(expiry) ? expiry : 'all',
+        );
+        this.search.set(params.get('recherche') ?? '');
+      });
+    void this.inventory.load();
   }
-
-  readonly filteredProducts = computed(() => {
-    const search = this.searchTerm().trim().toLowerCase();
-    const storageId = this.selectedStorageId();
-    const expiryType = this.selectedExpiryType();
-    const expiryFilter = this.selectedExpiryFilter();
-
-    return this.products().filter((product) => {
-      const matchesSearch = product.name.toLowerCase().includes(search);
-
-      const matchesStorage =
-        storageId === 'all' || product.storage_id === storageId;
-
-      const matchesExpiryType =
-        expiryType === 'all' || product.expiry_type === expiryType;
-
-      const matchesExpiry =
-        expiryFilter === 'all' ||
-        this.getExpiryStatus(product.expiry_date) === expiryFilter;
-
-      return (
-        matchesSearch && matchesStorage && matchesExpiryType && matchesExpiry
+  filter(key: 'stockage' | 'etat', value: string): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { [key]: value === 'all' ? null : value },
+      queryParamsHandling: 'merge',
+    });
+  }
+  reset(): void {
+    this.search.set('');
+    void this.router.navigate(['/produits']);
+  }
+  open(product: ProductDto, mode: 'edit' | 'delete' | 'consume'): void {
+    this.selected.set(product);
+    this.mode.set(mode);
+    this.error.set('');
+  }
+  close(): void {
+    if (!this.busy()) {
+      this.mode.set(null);
+      this.selected.set(null);
+      this.error.set('');
+    }
+  }
+  async save(data: ManualProductSubmission): Promise<void> {
+    const product = this.selected(),
+      values = data.products[0];
+    if (!product?.id || !product.storageId || !values) return;
+    const updated = { ...product, ...values, quantity: (values.quantity ?? 1) + (product.consumedQuantity ?? 0) };
+    await this.perform(async () => {
+      await firstValueFrom(
+        this.api.updateProduct(product.storageId!, product.id!, updated),
+      );
+      this.inventory.products.update((products) =>
+        products.map((item) => (item.id === product.id ? updated : item)),
       );
     });
-  });
-
-  async loadData(): Promise<void> {
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
-
+  }
+  async consume(quantity: number): Promise<void> {
+    const product = this.selected();
+    if (!product?.id || !product.storageId) return;
+    await this.perform(async () => {
+      const updated = await firstValueFrom(this.api.consumeProduct(product.storageId!, product.id!, quantity));
+      this.inventory.products.update(products => products.map(item => item.id === product.id ? updated : item));
+    });
+  }
+  async delete(): Promise<void> {
+    const product = this.selected();
+    if (!product?.id || !product.storageId) return;
+    await this.perform(async () => {
+      await firstValueFrom(
+        this.api.deleteProduct(product.storageId!, product.id!),
+      );
+      this.inventory.products.update((products) =>
+        products.filter((item) => item.id !== product.id),
+      );
+    });
+  }
+  private async perform(action: () => Promise<void>): Promise<void> {
+    if (this.busy()) return;
+    this.busy.set(true);
+    this.error.set('');
     try {
-      const [products, storages] = await Promise.all([
-        this.productService.getAll(),
-        this.storageService.getAll(),
-      ]);
-
-      this.products.set(products);
-      this.storages.set(storages);
-    } catch (error) {
-      console.error('Erreur lors du chargement des produits :', error);
-      this.errorMessage.set('Impossible de charger les produits.');
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  openEditModal(product: Product): void {
-    this.selectedProduct.set(product);
-    this.errorMessage.set(null);
-    this.isFormModalOpen.set(true);
-  }
-
-  closeFormModal(): void {
-    if (this.isSaving()) {
-      return;
-    }
-
-    this.isFormModalOpen.set(false);
-    this.selectedProduct.set(null);
-  }
-
-  async saveProduct(
-    data: CreateProduct & { storage_id: string },
-  ): Promise<void> {
-    if (this.isSaving()) {
-      return;
-    }
-
-    this.isSaving.set(true);
-    this.errorMessage.set(null);
-
-    try {
-      const selected = this.selectedProduct();
-
-      if (selected) {
-        const changes: UpdateProduct = {
-          name: data.name,
-          barcode: data.barcode,
-          storage_id: data.storage_id,
-          expiry_date: data.expiry_date,
-          expiry_type: data.expiry_type,
-          package_size: data.package_size,
-          package_unit: data.package_unit,
-        };
-
-        const updated = await this.productService.update(selected.id, changes);
-
-        this.products.update((current) =>
-          current.map((product) =>
-            product.id === updated.id ? updated : product,
-          ),
-        );
-      } else {
-        const { storage_id, ...productData } = data;
-
-        const created = await this.productService.createMany(storage_id, [
-          productData,
-        ]);
-
-        this.products.update((current) => [...current, ...created]);
-      }
-
-      this.isFormModalOpen.set(false);
-      this.selectedProduct.set(null);
-    } catch (error) {
-      console.error('Erreur lors de l’enregistrement du produit :', error);
-      this.errorMessage.set(
-        'Impossible d’enregistrer ce produit. Vérifiez les informations saisies.',
+      await action();
+      this.mode.set(null);
+      this.selected.set(null);
+    } catch {
+      this.error.set(
+        'L’enregistrement a échoué. Vos informations sont conservées, réessayez.',
       );
     } finally {
-      this.isSaving.set(false);
+      this.busy.set(false);
     }
   }
-
-  openDeleteModal(product: Product): void {
-    this.selectedProduct.set(product);
-    this.errorMessage.set(null);
-    this.isDeleteModalOpen.set(true);
-  }
-
-  closeDeleteModal(): void {
-    if (this.isDeleting()) {
-      return;
-    }
-
-    this.isDeleteModalOpen.set(false);
-    this.selectedProduct.set(null);
-  }
-
-  async confirmDelete(): Promise<void> {
-    const product = this.selectedProduct();
-
-    if (!product || this.isDeleting()) {
-      return;
-    }
-
-    this.isDeleting.set(true);
-    this.errorMessage.set(null);
-
-    try {
-      await this.productService.delete(product.id);
-
-      this.products.update((current) =>
-        current.filter((item) => item.id !== product.id),
-      );
-
-      this.isDeleteModalOpen.set(false);
-      this.selectedProduct.set(null);
-    } catch (error) {
-      console.error('Erreur lors de la suppression du produit :', error);
-      this.errorMessage.set('Impossible de supprimer ce produit.');
-    } finally {
-      this.isDeleting.set(false);
-    }
-  }
-
-  private getExpiryStatus(expiryDate: string): ExpiryFilter {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const expiry = new Date(`${expiryDate}T00:00:00`);
-
-    const difference = Math.ceil(
-      (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
-    );
-
-    if (difference < 0) return 'expired';
-    if (difference <= 3) return 'soon';
-
-    return 'normal';
-  }
-
-  readonly isAddModalOpen = signal(false);
-
-  openAddModal(): void {
-    this.isAddModalOpen.set(true);
-  }
-
-  closeAddModal(): void {
-    this.isAddModalOpen.set(false);
-  }
-
- 
 }

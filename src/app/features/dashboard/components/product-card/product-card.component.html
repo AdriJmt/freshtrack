@@ -1,61 +1,66 @@
-<article class="product-card">
-    <div class="product-card__header">
-        <div class="product-card__identity">
-            <h2>{{ product().name }}</h2>
-
-            <span class="product-card__storage">
-                {{ storageName() }}
-            </span>
-        </div>
-
-        <div class="product-card__menu">
-            <button class="product-card__menu-trigger" type="button" aria-label="Options du produit"
-                aria-haspopup="true" [attr.aria-expanded]="isMenuOpen()" (click)="toggleMenu()">
-                <span aria-hidden="true">•••</span>
-            </button>
-
-            @if (isMenuOpen()) {
-            <div class="product-card__popover" role="menu">
-                <button type="button" role="menuitem" (click)="editProduct()">
-                    Modifier
-                </button>
-
-                <button class="product-card__delete" type="button" role="menuitem" (click)="deleteProduct()">
-                    Supprimer
-                </button>
-            </div>
-            }
-        </div>
+<article
+  class="product-card" [class.product-card--consumed]="history() || remaining() === 0"
+  [class.product-card--unknown]="expiry().status === 'unknown'"
+  [class.product-card--expired]="expiry().status === 'expired'"
+  [class.product-card--soon]="expiry().status === 'soon'"
+>
+  <div class="product-card__main">
+    <app-product-image
+      [barcode]="product().barcode"
+      [name]="product().name ?? 'Produit'"
+    />
+    <div class="product-card__identity">
+      <span class="product-card__quantity"
+        >{{ shownQuantity() }}
+        {{ shownQuantity() > 1 ? 'articles' : 'article' }}</span
+      >
+      <h3 [title]="product().name ?? ''">
+        {{ product().name || 'Produit sans nom' }}
+      </h3>
+      <a
+        [routerLink]="['/produits']"
+        [queryParams]="{ stockage: product().storageId }"
+        >{{ storageName() }}</a
+      >
     </div>
-
-    <div class="product-card__details">
-        <div class="product-card__expiry">
-            <span class="product-card__label">Date de péremption</span>
-
-            <div class="product-card__expiry-value">
-                <span class="product-card__status" [class.product-card__status--expired]="expiryStatus === 'expired'"
-                    [class.product-card__status--soon]="expiryStatus === 'soon'"
-                    [class.product-card__status--normal]="expiryStatus === 'normal'"></span>
-
-                {{ expiryLabel }}
-            </div>
-        </div>
-
-        <span class="product-card__type" [class.product-card__type--dlc]="product().expiry_type === 'DLC'"
-            [class.product-card__type--ddm]="product().expiry_type === 'DDM'">
-            {{ product().expiry_type }}
-        </span>
-    </div>
-
+  </div>
+  <div class="product-card__date">
+    <span>{{ history() ? (remaining() > 0 ? 'Partiellement consommé' : 'Consommé') : expiry().label }}</span
+    ><strong>{{ history() ? (remaining() > 0 ? remaining() + ' en réserve' : 'Retiré des réserves') : expiry().summary }}</strong>
+  </div>
+  <footer>
     @if (product().barcode) {
-    <div class="product-card__barcode">
-        Code-barres : {{ product().barcode }}
-    </div>
+      <span class="product-card__barcode" [title]="product().barcode">{{
+        product().barcode
+      }}</span>
+    } @else {
+      <span>Sans code-barres</span>
     }
-
-    @if (product().package_size && product().package_unit) {
-    <div class="product-card__package">
-        {{ product().package_size }} {{ product().package_unit }}
-    </div>
+    @if (editable()) {
+      <div class="product-card__actions">
+        @if (remaining() > 0) {
+          <button class="product-card__consume" type="button" (click)="consume.emit(product())" [attr.aria-label]="'Marquer ' + product().name + ' comme consommé'">Consommé</button>
+        <button
+          type="button"
+          (click)="edit.emit(product())"
+          [attr.aria-label]="'Modifier ' + product().name"
+        >
+          Modifier
+        </button>
+        }
+        <button
+          class="product-card__delete"
+          type="button"
+          (click)="delete.emit(product())"
+          [attr.aria-label]="'Supprimer ' + product().name"
+        >
+          Supprimer
+        </button>
+      </div>
+    } @else {
+      <a routerLink="/produits" [queryParams]="{ recherche: product().name }"
+        >Voir →</a
+      >
     }
+  </footer>
 </article>

@@ -1,0 +1,78 @@
+@use 'styles/abstracts/variables' as v;
+.account-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: v.$spacing-lg;
+  align-items: start;
+  max-width: 1060px;
+}
+form {
+  display: grid;
+  gap: v.$spacing-sm;
+  label {
+    margin-top: v.$spacing-sm;
+    font-size: v.$font-size-base;
+    font-weight: 600;
+    span {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      font-weight: 400;
+    }
+  }
+  input {
+    width: 100%;
+    min-height: v.$input-height;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius-md;
+    padding: v.$spacing-sm v.$spacing-md;
+  }
+  small {
+    color: v.$color-text-muted;
+  }
+  button {
+    justify-self: start;
+    margin-top: v.$spacing-md;
+  }
+}
+.account-email {
+  margin-top: v.$spacing-lg;
+  padding: v.$spacing-md;
+  background: v.$color-background;
+  border-radius: v.$radius-md;
+  span,
+  strong,
+  small {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+  span {
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+  }
+  strong {
+    margin: v.$spacing-sm 0;
+    font-size: v.$font-size-base;
+  }
+  small {
+    color: v.$color-primary;
+  }
+  p {
+    font-size: v.$font-size-sm;
+    color: v.$color-text-muted;
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+}
+.error {
+  color: v.$color-danger;
+  font-size: v.$font-size-sm;
+}
+.success {
+  color: v.$color-primary;
+  font-size: v.$font-size-sm;
+}
+@media (max-width: v.$breakpoint-tablet) {
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+}

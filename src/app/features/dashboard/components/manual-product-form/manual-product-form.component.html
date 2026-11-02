@@ -1,122 +1,145 @@
 <div class="manual-form">
-    <div class="manual-form__header">
-        <div>
-            <h2>Ajouter des produits</h2>
-            <p>Renseignez les informations des aliments à enregistrer.</p>
-        </div>
+  <div class="manual-form__content">
+    <div class="manual-form__storage">
+      <label for="storage">Lieu de stockage</label>
 
-        <button class="manual-form__close" type="button" aria-label="Fermer" (click)="cancel.emit()">
-            &times;
-        </button>
+      <app-select
+        controlId="storage"
+        label="Lieu de stockage"
+        [disabled]="!!initialProduct() || saving()"
+        [options]="storageOptions()"
+        [value]="selectedStorageId()"
+        (valueChange)="selectedStorageId.set($event)"
+      />
     </div>
 
-    <div class="manual-form__content">
-        <div class="manual-form__storage">
-            <label for="storage">Lieu de stockage</label>
-
-            <select id="storage" [value]="selectedStorageId()"
-                (change)="selectedStorageId.set($any($event.target).value)">
-                <option value="" disabled>Sélectionner un emplacement</option>
-
-                @for (storage of storages(); track storage.id) {
-                <option [value]="storage.id">
-                    {{ storage.name }}
-                </option>
-                }
-            </select>
+    <div class="manual-form__products">
+      <div class="manual-form__section-header">
+        <div>
+          <h3>Produits</h3>
+          <span>{{ products().length }} produit(s)</span>
         </div>
 
-        <div class="manual-form__products">
-            <div class="manual-form__section-header">
-                <div>
-                    <h3>Produits</h3>
-                    <span>{{ products().length }} produit(s)</span>
-                </div>
+        <button
+          [hidden]="!!initialProduct()"
+          class="manual-form__add-button"
+          type="button"
+          [disabled]="saving()"
+          (click)="addProduct()"
+        >
+          <span aria-hidden="true">+</span>
+          Ajouter
+        </button>
+      </div>
 
-                <button class="manual-form__add-button" type="button" (click)="addProduct()">
-                    <span aria-hidden="true">+</span>
-                    Ajouter
-                </button>
+      @for (product of products(); track product.id; let index = $index) {
+        <article class="manual-form__product">
+          <div class="manual-form__product-header">
+            <h4>Produit {{ index + 1 }}</h4>
+
+            @if (products().length > 1) {
+              <button
+                class="manual-form__remove-button"
+                type="button"
+                [attr.aria-label]="'Supprimer le produit ' + (index + 1)"
+                [disabled]="saving()"
+                (click)="removeProduct(product.id)"
+              >
+                Supprimer
+              </button>
+            }
+          </div>
+
+          <div class="manual-form__fields">
+            <div class="manual-form__field manual-form__field--full">
+              <label [for]="'name-' + product.id">Nom du produit</label>
+              <input
+                [id]="'name-' + product.id"
+                type="text"
+                [disabled]="saving()"
+                placeholder="Ex. : Yaourt nature"
+                [value]="product.name"
+                (input)="
+                  updateProduct(product.id, { name: $any($event.target).value })
+                "
+                required
+              />
             </div>
 
-            @for (product of products(); track product.id; let index = $index) {
-            <article class="manual-form__product">
-                <div class="manual-form__product-header">
-                    <h4>Produit {{ index + 1 }}</h4>
+            <div class="manual-form__field">
+              <label [for]="'expiry-' + product.id">Date de péremption</label>
+              <input
+                [id]="'expiry-' + product.id"
+                type="date"
+                [disabled]="saving()"
+                [value]="product.expiryDate"
+                (change)="
+                  updateProduct(product.id, {
+                    expiryDate: $any($event.target).value,
+                  })
+                "
+                required
+              />
+            </div>
 
-                    @if (products().length > 1) {
-                    <button class="manual-form__remove-button" type="button"
-                        [attr.aria-label]="'Supprimer le produit ' + (index + 1)" (click)="removeProduct(product.id)">
-                        Supprimer
-                    </button>
-                    }
-                </div>
+            <div class="manual-form__field">
+              <label [for]="'barcode-' + product.id">Code-barres</label>
+              <input
+                [id]="'barcode-' + product.id"
+                type="text"
+                [disabled]="saving()"
+                placeholder="Facultatif"
+                [value]="product.barcode"
+                (input)="
+                  updateProduct(product.id, {
+                    barcode: $any($event.target).value,
+                  })
+                "
+              />
+            </div>
 
-                <div class="manual-form__fields">
-                    <div class="manual-form__field manual-form__field--full">
-                        <label [for]="'name-' + product.id">Nom du produit</label>
-                        <input [id]="'name-' + product.id" type="text" placeholder="Ex. : Yaourt nature"
-                            [value]="product.name"
-                            (input)="updateProduct(product.id, { name: $any($event.target).value })" required />
-                    </div>
-
-                    <div class="manual-form__field">
-                        <label [for]="'expiry-' + product.id">Date de péremption</label>
-                        <input [id]="'expiry-' + product.id" type="date" [value]="product.expiry_date"
-                            (change)="updateProduct(product.id, { expiry_date: $any($event.target).value })" required />
-                    </div>
-
-                    <div class="manual-form__field">
-                        <label [for]="'type-' + product.id">Type de date</label>
-                        <select [id]="'type-' + product.id" [value]="product.expiry_type"
-                            (change)="updateProduct(product.id, { expiry_type: $any($event.target).value })">
-                            <option value="DLC">DLC</option>
-                            <option value="DDM">DDM</option>
-                        </select>
-                    </div>
-
-                    <div class="manual-form__field">
-                        <label [for]="'barcode-' + product.id">Code-barres</label>
-                        <input [id]="'barcode-' + product.id" type="text" placeholder="Facultatif"
-                            [value]="product.barcode"
-                            (input)="updateProduct(product.id, { barcode: $any($event.target).value })" />
-                    </div>
-
-                    <div class="manual-form__field">
-                        <label [for]="'size-' + product.id">Quantité</label>
-                        <input [id]="'size-' + product.id" type="number" min="0" step="any" placeholder="Ex. : 500"
-                            [value]="product.package_size ?? ''" (input)="updateProduct(product.id, {
-                  package_size: $any($event.target).value === ''
-                    ? null
-                    : +$any($event.target).value
-                })" />
-                    </div>
-
-                    <div class="manual-form__field">
-                        <label [for]="'unit-' + product.id">Unité</label>
-                        <select [id]="'unit-' + product.id" [value]="product.package_unit"
-                            (change)="updateProduct(product.id, { package_unit: $any($event.target).value })">
-                            <option value="">Aucune</option>
-                            <option value="g">g</option>
-                            <option value="kg">kg</option>
-                            <option value="ml">ml</option>
-                            <option value="l">l</option>
-                            <option value="unité">Unité(s)</option>
-                        </select>
-                    </div>
-                </div>
-            </article>
-            }
-        </div>
+            <div class="manual-form__field">
+              <label [for]="'quantity-' + product.id">Quantité</label>
+              <input
+                [id]="'quantity-' + product.id"
+                type="number"
+                [disabled]="saving()"
+                min="1"
+                max="2147483647"
+                step="1"
+                inputmode="numeric"
+                [value]="product.quantity"
+                (input)="
+                  updateProduct(product.id, {
+                    quantity: $any($event.target).valueAsNumber,
+                  })
+                "
+                required
+              />
+            </div>
+          </div>
+        </article>
+      }
     </div>
+  </div>
 
-    <div class="manual-form__footer">
-        <button class="manual-form__cancel-button" type="button" (click)="cancel.emit()">
-            Annuler
-        </button>
+  <div class="manual-form__footer modal-footer">
+    <button
+      class="manual-form__cancel-button"
+      type="button"
+      [disabled]="saving()"
+      (click)="cancel.emit()"
+    >
+      Annuler
+    </button>
 
-        <button class="manual-form__submit-button" type="button" [disabled]="!isFormValid()" (click)="submit()">
-            Enregistrer {{ products().length }} produit(s)
-        </button>
-    </div>
+    <button
+      class="manual-form__submit-button"
+      type="button"
+      [disabled]="!isFormValid() || saving()"
+      (click)="submit()"
+    >
+      Enregistrer {{ products().length }} produit(s)
+    </button>
+  </div>
 </div>

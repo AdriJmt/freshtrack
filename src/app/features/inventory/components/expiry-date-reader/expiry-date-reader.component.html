@@ -1,0 +1,27 @@
+<div class="date-scanner" [attr.aria-busy]="!errorMessage() && !candidateDate() && !detectedDate()" (pointerdown)="start()">
+  <video #video autoplay muted playsinline [hidden]="!!detectedDate() || !!errorMessage()"></video>
+  @if (detectedDate()) { <div class="date-scanner__confirmation"><span aria-hidden="true">✓</span><strong>Date lue</strong></div> }
+  @if (!errorMessage()) {
+    @if (!detectedDate()) {
+    <div class="date-scanner__frame" [class.date-scanner__frame--detected]="!!candidateDate()" aria-hidden="true"></div>
+    }
+    <div class="date-scanner__status" role="status" aria-live="polite">
+      @if (!candidateDate() && !detectedDate()) { <span class="date-scanner__spinner" aria-hidden="true"></span> }
+      {{ status() }}
+      @if (detectedDate()) { <strong>{{ detectedDate() | date:'dd/MM/yyyy' }}</strong> }
+    </div>
+  } @else {
+    <div class="date-scanner__error"><p role="alert">{{ errorMessage() }}</p><button type="button" (click)="start()">Réessayer</button></div>
+  }
+</div>
+@if (candidateDate() && !detectedDate()) {
+  <div class="date-scanner__candidate" role="status">
+    <span>Date à confirmer <strong>{{ candidateDate() | date:'dd/MM/yyyy' }}</strong></span>
+    <button type="button" (click)="retryDate()">Relire</button>
+    <button type="button" (click)="confirmDate(candidateDate())">Utiliser cette date</button>
+  </div>
+}
+<div class="date-scanner__footer">
+  <p>Cadrez la date imprimée, à l’horizontale. Vérifiez la date proposée puis touchez « Utiliser cette date ».</p>
+  <button type="button" (click)="skip.emit()" [disabled]="!!detectedDate()">Saisir la date</button>
+</div>

@@ -1,0 +1,4 @@
+@use "styles/abstracts/variables" as v;
+.scan-page { min-height: 100dvh; padding: v.$spacing-lg v.$spacing-md; background: v.$color-background; color: v.$color-text; }
+app-scan-flow { display: block; max-width: 560px; margin: auto; border: 1px solid v.$color-border; border-radius: v.$radius-lg; background: v.$color-surface; box-shadow: 0 12px 40px rgba(v.$color-text,.05); overflow: hidden; }
+@media (max-width: v.$breakpoint-mobile) { .scan-page { padding: v.$spacing-sm; } app-scan-flow { border: 0; border-radius: v.$radius-md; } }

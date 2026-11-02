@@ -3,9 +3,11 @@
 @use "base/typography";
 @use "base/global";
 @use "components/buttons";
+@use "components/modal";
 @use "layout/container";
 @use "layout/auth-layout";
 @use "layout/dashboard-layout";
+@use "layout/workspace";
 @use "pages/login";
 @use "themes/default";
 @use "vendors";

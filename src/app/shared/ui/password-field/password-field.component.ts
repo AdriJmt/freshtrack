@@ -14,6 +14,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   ],
 })
 export class PasswordFieldComponent implements ControlValueAccessor {
+  readonly controlId = input('password');
+  readonly label = input('Mot de passe');
   readonly placeholder = input('Votre mot de passe');
   readonly autocomplete = input('current-password');
 

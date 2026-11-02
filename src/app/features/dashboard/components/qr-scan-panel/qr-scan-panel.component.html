@@ -1,1 +1,22 @@
-<p>qr-scan-panel works!</p>
+<section class="qr-panel" aria-label="Continuer sur téléphone">
+  <div class="qr-panel__header">
+    <p>Scannez ce QR code avec l’appareil photo de votre téléphone. Aucune connexion au compte n’est nécessaire.</p>
+  </div>
+  <div class="qr-panel__code" #qr role="img" aria-label="QR code de la session temporaire de scan" [attr.aria-busy]="loading()"></div>
+  @if (loading()) { <p role="status">Création de votre session…</p> }
+  @if (errorMessage()) { <p class="qr-panel__error" role="alert">{{ errorMessage() }}</p> }
+  @if (!scanUrl() && !loading()) {
+    <button class="button button--primary" type="button" (click)="generate()">Générer un QR code</button>
+  }
+  @if (scanUrl()) {
+    <p class="qr-panel__status" role="status" aria-live="polite">
+      @if (connected()) { Téléphone connecté · {{ addedCount() }} produit(s) ajouté(s) }
+      @else { En attente du téléphone… }
+    </p>
+    <ol class="qr-panel__steps">
+      <li>Scannez le code-barres, puis la date de péremption.</li>
+      <li>Vérifiez les informations, choisissez un stockage et validez.</li>
+    </ol>
+    <p class="qr-panel__hint">Valable jusqu’à {{ expiresAt() | date:'HH:mm' }}. Fermer cette fenêtre désactive le QR code.</p>
+  }
+</section>

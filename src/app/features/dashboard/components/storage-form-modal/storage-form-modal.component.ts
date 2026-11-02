@@ -1,50 +1,45 @@
-import { Component, input, output, signal } from '@angular/core';
+import { ModalComponent } from '../../../../shared/ui/modal/modal.component';
+import { Component, input, output, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { Storage, StorageType } from '../../../../core/models/storage.model';
+import { StorageDto } from '../../../../core/api/models';
 
 export interface StorageFormData {
   name: string;
-  type: StorageType;
+  type: NonNullable<StorageDto['type']>;
 }
 
 @Component({
   selector: 'app-storage-form-modal',
-  imports: [FormsModule],
+  imports: [ModalComponent, FormsModule],
   templateUrl: './storage-form-modal.component.html',
   styleUrl: './storage-form-modal.component.scss',
 })
 export class StorageFormModalComponent {
-  readonly storage = input<Storage | null>(null);
+  readonly storage = input<StorageDto | null>(null);
   readonly saving = input(false);
   readonly errorMessage = input<string | null>(null);
+  readonly initialType = input<NonNullable<StorageDto['type']>>('FRIDGE');
 
   readonly save = output<StorageFormData>();
   readonly cancel = output<void>();
 
   readonly name = signal('');
-  readonly initialType = input<StorageType>('fridge');
-  readonly type = signal<StorageType>('fridge');
+  readonly type = signal<NonNullable<StorageDto['type']>>('FRIDGE');
 
-  constructor() {}
+  constructor() {
+    effect(() => {
+      const storage = this.storage();
 
-  ngOnInit(): void {
-    this.type.set(this.initialType());
-
-    const storage = this.storage();
-
-    if (storage) {
-      this.name.set(storage.name);
-      this.type.set(storage.type);
-    }
+      this.name.set(storage?.name ?? '');
+      this.type.set(storage?.type ?? this.initialType());
+    });
   }
 
   submit(): void {
     const name = this.name().trim();
 
-    if (!name || this.saving()) {
-      return;
-    }
+    if (!name || this.saving()) return;
 
     this.save.emit({
       name,

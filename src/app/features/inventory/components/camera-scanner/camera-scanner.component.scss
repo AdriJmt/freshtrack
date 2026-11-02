@@ -1,0 +1,84 @@
+@use "styles/abstracts/variables" as vars;
+
+.camera-scanner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: vars.$radius-md;
+  background: vars.$color-text;
+  video, canvas { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  video[hidden], canvas[hidden] { display: none; }
+  &__error { padding: vars.$spacing-md; color: vars.$color-text; background: vars.$color-primary-light; line-height: 1.6; }
+  &__status { padding: vars.$spacing-md; color: vars.$color-surface; }
+}
+.camera-photo {
+  display: grid;
+  gap: vars.$spacing-sm;
+  margin-top: vars.$spacing-md;
+  padding: vars.$spacing-md;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  label { font-weight: 600; }
+  input { width: 100%; font: inherit; }
+}
+
+.camera-scanner {
+  &__target {
+    position: absolute;
+    border: 2px solid vars.$color-surface;
+    border-radius: vars.$radius-md;
+    box-shadow: 0 0 0 100vmax rgba(vars.$color-text, .25);
+    pointer-events: none;
+    transition: border-color .15s;
+    overflow: hidden;
+    &--detected { border: 4px solid vars.$color-primary; background: rgba(vars.$color-primary, .2); outline: 1px solid vars.$color-surface; }
+  }
+  &__line {
+    position: absolute;
+    inset: 50% 0 auto;
+    height: 2px;
+    background: vars.$color-surface;
+    animation: scan-line 2s ease-in-out infinite;
+  }
+  &__status {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: vars.$spacing-sm;
+    margin: 0;
+    background: rgba(vars.$color-text, .8);
+    text-align: center;
+    small { width: 100%; font-variant-numeric: tabular-nums; }
+  }
+  &__spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid vars.$color-auth-border;
+    border-top-color: vars.$color-surface;
+    border-radius: 50%;
+    animation: scan-spin .8s linear infinite;
+  }
+}
+@keyframes scan-line { 0%, 100% { transform: translateY(-28px); } 50% { transform: translateY(28px); } }
+@keyframes scan-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .camera-scanner__line, .camera-scanner__spinner { animation: none; }
+}
+
+:host { font-size: vars.$font-size-sm; }
+.camera-scanner__status { padding: vars.$spacing-sm; font-size: vars.$font-size-sm; }
+.camera-photo { gap: vars.$spacing-xs; margin-top: vars.$spacing-sm; padding: vars.$spacing-sm; font-size: vars.$font-size-sm; }
+
+.camera-scanner__confirmation { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: vars.$spacing-sm; min-height: 220px; padding: vars.$spacing-lg; color: vars.$color-primary; background: vars.$color-primary-light; border: 0; outline: 0; > span { font-size: 32px; } strong { font-size: vars.$font-size-base; } small { font-variant-numeric: tabular-nums; } }
+
+.camera-diagnostic { margin-top: vars.$spacing-sm; color: vars.$color-text-muted; font-size: vars.$font-size-xs; summary { cursor: pointer; } p { margin: vars.$spacing-xs 0; } }
+
+.camera-scanner__active {
+  flex: 0 0 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: vars.$color-primary;
+}

@@ -13,6 +13,7 @@ export class DashboardNavbarComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
+  readonly user = this.authService.currentUser;
   readonly isProfileMenuOpen = signal(false);
   readonly isLoggingOut = signal(false);
   readonly logoutError = signal('');

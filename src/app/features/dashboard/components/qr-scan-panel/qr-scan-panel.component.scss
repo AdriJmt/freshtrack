@@ -1,0 +1,66 @@
+@use "styles/abstracts/variables" as vars;
+
+:host { display: block; }
+
+.qr-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: vars.$spacing-md;
+  padding: vars.$spacing-md vars.$spacing-lg;
+  font-size: vars.$font-size-sm;
+  color: vars.$color-text;
+  background: vars.$color-surface;
+
+  &__header {
+    text-align: center;
+    h2 { margin: vars.$spacing-sm 0; font-size: vars.$font-size-xl; }
+    p { margin: 0; color: vars.$color-text-muted; line-height: 1.6; }
+  }
+
+  &__eyebrow {
+    color: vars.$color-primary;
+    font-size: vars.$font-size-sm;
+    font-weight: 600;
+  }
+
+  &__code {
+    display: grid;
+    place-items: center;
+    width: fit-content;
+    min-height: 0;
+    max-width: 100%;
+    padding: vars.$spacing-xs;
+    border: 1px solid vars.$color-border;
+    border-radius: vars.$radius-sm;
+    background: vars.$color-surface;
+    overflow: hidden;
+  }
+
+  &__steps {
+    margin: 0;
+    padding: vars.$spacing-md vars.$spacing-xl;
+    border-radius: vars.$radius-md;
+    background: vars.$color-primary-light;
+    font-size: vars.$font-size-sm;
+    line-height: 1.6;
+    li + li { margin-top: vars.$spacing-sm; }
+    li::marker { color: vars.$color-primary; font-weight: 600; }
+  }
+
+  &__link {
+    color: vars.$color-primary;
+    font-size: vars.$font-size-sm;
+    font-weight: 600;
+    text-underline-offset: vars.$spacing-xs;
+    &:hover { color: vars.$color-primary-dark; }
+    &:focus-visible { outline: 2px solid vars.$color-primary; outline-offset: vars.$spacing-xs; }
+  }
+
+  &__hint { margin: 0; text-align: center; color: vars.$color-text-muted; font-size: vars.$font-size-sm; line-height: 1.5; }
+  &__error { color: vars.$color-danger; }
+}
+
+@media (max-width: vars.$breakpoint-mobile) {
+  .qr-panel { padding: vars.$spacing-lg vars.$spacing-md; gap: vars.$spacing-md; }
+}

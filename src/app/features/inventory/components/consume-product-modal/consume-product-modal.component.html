@@ -1,0 +1,7 @@
+<app-modal title="Marquer comme consommé" [busy]="busy()" (closed)="cancel.emit()">
+  <form (ngSubmit)="submit()"><p><strong>{{ product().name }}</strong></p><p>Les articles consommés seront retirés des réserves et conservés dans l’historique.</p>
+    <label for="consumed-quantity">Quantité consommée</label><div class="quantity"><input id="consumed-quantity" name="quantity" type="number" min="1" [max]="remaining(product())" step="1" inputmode="numeric" [(ngModel)]="quantity" [disabled]="busy()" required /><span>sur {{ remaining(product()) }} disponible(s)</span><button type="button" [disabled]="busy()" (click)="quantity = remaining(product())">Tout le lot</button></div>
+    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+    <footer class="modal-footer"><button class="action" type="button" [disabled]="busy()" (click)="cancel.emit()">Annuler</button><button class="action action--primary" type="submit" [disabled]="busy() || !valid()">{{ busy() ? 'Enregistrement…' : 'Confirmer la consommation' }}</button></footer>
+  </form>
+</app-modal>

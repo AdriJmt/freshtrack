@@ -1,3 +1,4 @@
+import { provideAppTesting } from '../../../../../testing/test-providers';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DashboardLayoutComponent } from './dashboard-layout.component';
@@ -8,6 +9,7 @@ describe('DashboardLayoutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: provideAppTesting(),
       imports: [DashboardLayoutComponent]
     })
     .compileComponents();

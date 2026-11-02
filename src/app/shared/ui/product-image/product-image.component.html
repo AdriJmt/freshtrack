@@ -1,0 +1,4 @@
+<div class="product-image" [class.product-image--loading]="loading()">
+  @if (url()) { <img [src]="url()!" [alt]="name()" loading="lazy" decoding="async" referrerpolicy="no-referrer" (error)="failed()" /> }
+  @else { <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3h8v4l3 4v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9l3-4V3Z" /><path d="M8 7h8M5 13h14M9 16h6" /></svg> }
+</div>

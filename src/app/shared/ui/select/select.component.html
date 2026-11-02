@@ -1,0 +1,12 @@
+<button #trigger type="button" class="select-trigger" role="combobox" [id]="controlId()" [disabled]="disabled()" [attr.aria-label]="label()" aria-haspopup="listbox" [attr.aria-expanded]="opened()" [attr.aria-controls]="panelId" [attr.aria-activedescendant]="opened() && active() >= 0 ? panelId + '-' + active() : null" (click)="toggle()" (keydown)="keydown($event)">
+  <span [class.select-placeholder]="!selected()">{{ selected()?.label ?? placeholder() }}</span>
+  <svg viewBox="0 0 20 20" aria-hidden="true" [class.is-open]="opened()"><path d="m6 8 4 4 4-4" /></svg>
+</button>
+<div #panel popover="auto" class="select-options" role="listbox" [id]="panelId" [attr.aria-label]="label()" (toggle)="onToggle($event)" (mousedown)="$event.preventDefault()">
+  @for (option of options(); track option.value; let index = $index) {
+    <div role="option" class="select-option" [id]="panelId + '-' + index" [attr.aria-selected]="option.value === value()" [attr.aria-disabled]="!!option.disabled" [class.is-active]="index === active()" (mouseenter)="active.set(index)" (click)="choose(index)">
+      <span><strong>{{ option.label }}</strong>@if (option.description) { <small>{{ option.description }}</small> }</span>
+      @if (option.value === value()) { <span class="select-check" aria-hidden="true">✓</span> }
+    </div>
+  } @empty { <p class="select-empty">Aucune option disponible</p> }
+</div>

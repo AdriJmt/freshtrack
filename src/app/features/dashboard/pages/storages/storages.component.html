@@ -1,59 +1,72 @@
-<div class="storages-page">
-    <section class="storages-page__heading">
-        <div>
-            <h1>Mes stockages</h1>
-            <p>Gérez les différents emplacements de conservation de vos aliments.</p>
-        </div>
-
-        <div class="storages-page__actions">
-            <button class="storages-page__add storages-page__add--fridge" type="button"
-                (click)="openCreateModal('fridge')">
-                <span aria-hidden="true">+</span>
-                Ajouter un frigo
-            </button>
-
-            <button class="storages-page__add storages-page__add--cupboard" type="button"
-                (click)="openCreateModal('cupboard')">
-                <span aria-hidden="true">+</span>
-                Ajouter un placard
-            </button>
-        </div>
-    </section>
-
-    @if (errorMessage(); as error) {
-    <div class="storages-page__error" role="alert">
-        {{ error }}
+<div class="workspace">
+  <header class="workspace__heading">
+    <div>
+      <h1>Mes stockages</h1>
+      <p>Retrouvez le contenu de chaque espace en un clic.</p>
     </div>
-    }
-
-    <section class="storages-page__content">
-        @if (isLoading()) {
-        <div class="storages-page__state">
-            Chargement des stockages...
-        </div>
-        } @else if (storages().length === 0) {
-        <div class="storages-page__empty">
-            <h2>Aucun stockage pour le moment</h2>
-            <p>
-                Créez votre premier frigo ou placard pour organiser vos aliments.
-            </p>
-        </div>
-        } @else {
-        <div class="storages-page__grid">
-            @for (storage of storages(); track storage.id) {
-            <app-storage-card [storage]="storage" (edit)="openEditModal($event)" (delete)="openDeleteModal($event)" />
-            }
-        </div>
+    <div class="workspace__actions">
+      <button
+        class="action action--primary"
+        (click)="editor.open({ type: 'FRIDGE' })"
+      >
+        ＋ Réfrigérateur</button
+      ><button class="action" (click)="editor.open({ type: 'CUPBOARD' })">
+        ＋ Placard
+      </button>
+    </div>
+  </header>
+  @if (inventory.error()) {
+    <div class="workspace__error" role="alert">
+      {{ inventory.error()
+      }}<button class="action" (click)="inventory.load(true)">Réessayer</button>
+    </div>
+  }
+  @if (inventory.loading()) {
+    <app-content-skeleton variant="storages" label="Chargement des stockages" [count]="6" />
+  } @else if (!inventory.error()) {
+    @if (inventory.storages().length) {
+      <div class="workspace__results">
+        {{ inventory.storages().length }} stockage(s) ·
+        {{ inventory.activeProducts().length }} références
+      </div>
+      <div class="workspace__grid">
+        @for (storage of inventory.storages(); track storage.id) {
+          <app-storage-card
+            [storage]="storage"
+            [summary]="inventory.summaries().get(storage.id!)"
+            (edit)="editor.open($event)"
+            (delete)="editor.open($event, 'delete')"
+          />
         }
-    </section>
+      </div>
+    } @else {
+      <div class="workspace__empty">
+        <h2>Un espace pour vos premières réserves</h2>
+        <p>
+          Utilisez les boutons ci-dessus pour créer votre réfrigérateur ou votre
+          placard.
+        </p>
+      </div>
+    }
+  }
 </div>
-
-@if (isFormModalOpen()) {
-<app-storage-form-modal [storage]="selectedStorage()" [initialType]="newStorageType()" [saving]="isSaving()"
-    [errorMessage]="errorMessage()" (save)="saveStorage($event)" (cancel)="closeFormModal()" />
+@if (editor.mode() === 'form') {
+  <app-storage-form-modal
+    [storage]="editor.selected()"
+    [saving]="editor.busy()"
+    [errorMessage]="editor.error()"
+    (save)="editor.save($event)"
+    (cancel)="editor.close()"
+  />
 }
-
-@if (isDeleteModalOpen() && selectedStorage()) {
-<app-confirm-delete-modal [itemName]="selectedStorage()!.name" [deleting]="isDeleting()" [errorMessage]="errorMessage()"
-    (confirm)="confirmDelete()" (cancel)="closeDeleteModal()" />
+@if (editor.mode() === 'delete') {
+  <app-confirm-delete-modal
+    title="Supprimer ce stockage ?"
+    description="Les produits qu’il contient seront également supprimés. Cette action est irréversible."
+    [itemName]="editor.selected()?.name ?? ''"
+    [deleting]="editor.busy()"
+    [errorMessage]="editor.error()"
+    (confirm)="editor.delete()"
+    (cancel)="editor.close()"
+  />
 }

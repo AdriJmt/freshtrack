@@ -1,24 +1,43 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-import { CreateStorage, Storage, UpdateStorage } from '../models/storage.model';
+import { StorageDto, StorageDeletionDto } from '../api/models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StorageService {
-  async getAll(): Promise<Storage[]> {
-    return [];
+  private readonly apiUrl = `${environment.apiUrl}/storages`;
+
+  constructor(private readonly http: HttpClient) {}
+
+  getAllStorages(): Observable<StorageDto[]> {
+    return this.http.get<StorageDto[]>(this.apiUrl, {
+      withCredentials: true,
+    });
   }
 
-  async create(_storage: CreateStorage): Promise<Storage> {
-    throw new Error('StorageService temporairement indisponible.');
+  createStorage(storage: StorageDto): Observable<StorageDto> {
+    return this.http.post<StorageDto>(this.apiUrl, storage, {
+      withCredentials: true,
+    });
   }
 
-  async update(_id: string, _changes: UpdateStorage): Promise<Storage> {
-    throw new Error('StorageService temporairement indisponible.');
+  updateStorage(storage: StorageDto): Observable<void> {
+    return this.http.put<void>(this.apiUrl, storage, {
+      withCredentials: true,
+    });
   }
 
-  async delete(_id: string): Promise<void> {
-    return;
+  deleteStorage(
+    storageId: string,
+    deletion: StorageDeletionDto,
+  ): Observable<void> {
+    return this.http.request<void>('DELETE', `${this.apiUrl}/${storageId}`, {
+      body: deletion,
+      withCredentials: true,
+    });
   }
 }

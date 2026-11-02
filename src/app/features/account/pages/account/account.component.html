@@ -1,0 +1,129 @@
+<div class="workspace">
+  <a class="workspace__back" routerLink="/">← Tableau de bord</a>
+  <header class="workspace__heading">
+    <div>
+      <h1>Mon compte</h1>
+      <p>Gérez votre profil et la sécurité de votre connexion.</p>
+    </div>
+  </header>
+  @if (loading()) {
+    <app-content-skeleton variant="account" label="Chargement de votre compte" [count]="2" />
+  } @else if (loadError()) {
+    <div class="workspace__error" role="alert">
+      {{ loadError()
+      }}<button class="action" (click)="load()">Réessayer</button>
+    </div>
+  } @else if (account()) {
+    @let profile = account()!;
+    <div class="account-grid">
+      <section class="workspace__panel">
+        <div class="workspace__section">
+          <div>
+            <h2>Votre profil</h2>
+            <p>Le nom utilisé pour vous accueillir dans FreshTrack.</p>
+          </div>
+        </div>
+        <form (ngSubmit)="saveProfile()">
+          <label for="account-name">Nom affiché <span>Facultatif</span></label
+          ><input
+            id="account-name"
+            name="displayName"
+            [(ngModel)]="displayName"
+            maxlength="100"
+            autocomplete="nickname"
+            placeholder="Comment souhaitez-vous être appelé ?"
+            [disabled]="saving()"
+            (input)="saved.set(false)"
+          />
+          <div class="account-email">
+            <span>Adresse e-mail</span><strong>{{ profile.email }}</strong
+            ><small>{{
+              profile.emailVerified
+                ? 'Adresse vérifiée'
+                : 'Adresse non vérifiée'
+            }}</small>
+            <p>
+              Cette adresse sert à vous connecter et à vérifier votre compte.
+            </p>
+          </div>
+          @if (profileError()) {
+            <p class="error" role="alert">{{ profileError() }}</p>
+          }
+          @if (saved()) {
+            <p class="success" role="status">Votre profil a été mis à jour.</p>
+          }
+          <button
+            class="action action--primary"
+            [disabled]="
+              saving() || displayName.trim() === (profile.displayName ?? '')
+            "
+            type="submit"
+          >
+            {{ saving() ? 'Enregistrement…' : 'Enregistrer mon profil' }}
+          </button>
+        </form>
+      </section>
+      <section class="workspace__panel">
+        <div class="workspace__section">
+          <div>
+            <h2>Changer de mot de passe</h2>
+            <p>Vos sessions devront ensuite se reconnecter.</p>
+          </div>
+        </div>
+        <form (ngSubmit)="changePassword()">
+          <label for="current-password">Mot de passe actuel</label
+          ><app-password-field
+            controlId="current-password"
+            label="Mot de passe actuel"
+            name="currentPassword"
+            [(ngModel)]="currentPassword"
+            [disabled]="changingPassword()"
+            required
+          />
+          <label for="new-password">Nouveau mot de passe</label
+          ><app-password-field
+            controlId="new-password"
+            label="Nouveau mot de passe"
+            name="newPassword"
+            [(ngModel)]="newPassword"
+            autocomplete="new-password"
+            [disabled]="changingPassword()"
+            required
+          />
+          <small>Entre 8 et 72 caractères.</small>
+          <label for="confirm-new-password"
+            >Confirmer le nouveau mot de passe</label
+          ><app-password-field
+            controlId="confirm-new-password"
+            label="Confirmer le nouveau mot de passe"
+            name="confirmation"
+            [(ngModel)]="confirmation"
+            autocomplete="new-password"
+            [disabled]="changingPassword()"
+            required
+          />
+          @if (confirmation && newPassword !== confirmation) {
+            <p class="error">Les deux mots de passe ne correspondent pas.</p>
+          }
+          @if (passwordError()) {
+            <p class="error" role="alert">{{ passwordError() }}</p>
+          }
+          <button
+            class="action action--primary"
+            type="submit"
+            [disabled]="
+              changingPassword() ||
+              !currentPassword ||
+              !validPassword(newPassword) ||
+              confirmation !== newPassword
+            "
+          >
+            {{
+              changingPassword() ? 'Modification…' : 'Modifier mon mot de passe'
+            }}
+          </button>
+        </form>
+      </section>
+    </div>
+  }
+</div>

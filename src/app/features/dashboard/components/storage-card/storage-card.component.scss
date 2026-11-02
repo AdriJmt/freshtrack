@@ -1,135 +1,122 @@
-@use "styles/abstracts/variables" as vars;
-
+@use 'styles/abstracts/variables' as v;
+:host {
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
 .storage-card {
-  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 170px;
-  padding: vars.$spacing-lg;
-  border: 1px solid vars.$color-border;
-  border-radius: vars.$radius-lg;
-  background: vars.$color-surface;
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgb(0 0 0 / 5%);
-  }
-
-  &--fridge {
-    .storage-card__icon {
-      background: vars.$color-storage-fridge;
-      color: vars.$color-storage-fridge-text;
-    }
-
-    .storage-card__type {
-      color: vars.$color-storage-fridge-text;
-    }
-  }
-
+  height: 100%;
+  border: 1px solid v.$color-storage-fridge;
+  border-radius: v.$radius-lg;
+  background: v.$color-storage-fridge;
+  color: v.$color-text;
+  overflow: hidden;
   &--cupboard {
-    .storage-card__icon {
-      background: vars.$color-storage-cupboard;
-      color: vars.$color-storage-cupboard-text;
-    }
-
-    .storage-card__type {
-      color: vars.$color-storage-cupboard-text;
+    background: v.$color-storage-cupboard;
+    border-color: v.$color-storage-cupboard;
+  }
+  &__link {
+    display: block;
+    flex: 1;
+    padding: v.$spacing-lg;
+    text-decoration: none;
+    color: inherit;
+    &:hover h3 {
+      text-decoration: underline;
     }
   }
-
-  &__header {
+  &__heading {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: v.$spacing-sm;
+    > div {
+      flex: 1;
+      min-width: 0;
+    }
+    small {
+      color: v.$color-storage-fridge-text;
+      font-size: v.$font-size-xs;
+    }
+    h3 {
+      margin: v.$spacing-xs 0 0;
+      font-size: v.$font-size-lg;
+      overflow-wrap: anywhere;
+    }
   }
-
+  &--cupboard &__heading small {
+    color: v.$color-storage-cupboard-text;
+  }
   &__icon {
     display: grid;
-    width: 42px;
-    height: 42px;
     place-items: center;
-    border-radius: vars.$radius-md;
-    font-size: vars.$font-size-lg;
+    width: 44px;
+    height: 44px;
+    background: rgba(v.$color-surface, 0.7);
+    border-radius: v.$radius-md;
+    color: v.$color-storage-fridge-text;
+    font-size: v.$font-size-xl;
   }
-
-  &__menu {
-    position: relative;
-  }
-
-  &__menu-trigger {
-    display: grid;
-    width: 34px;
-    height: 34px;
-    place-items: center;
-    border: none;
-    border-radius: vars.$radius-sm;
-    background: transparent;
-    color: vars.$color-text-muted;
-    font-size: 17px;
-    letter-spacing: 1px;
-    cursor: pointer;
-
-    &:hover {
-      background: vars.$color-background;
-      color: vars.$color-text;
+  &__count {
+    margin-top: v.$spacing-lg;
+    font-size: v.$font-size-base;
+    strong {
+      font-size: v.$font-size-xl;
+      font-weight: 650;
+    }
+    span {
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
     }
   }
-
-  &__popover {
-    position: absolute;
-    z-index: 10;
-    top: calc(100% + 6px);
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    width: 160px;
-    padding: vars.$spacing-xs;
-    border: 1px solid vars.$color-border;
-    border-radius: vars.$radius-md;
-    background: vars.$color-surface;
-    box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
-
-    button {
-      padding: 10px vars.$spacing-sm;
-      border: none;
-      border-radius: vars.$radius-sm;
-      background: transparent;
-      color: vars.$color-text;
-      font-family: vars.$font-family-base;
-      font-size: vars.$font-size-sm;
-      text-align: left;
-      cursor: pointer;
-
-      &:hover {
-        background: vars.$color-background;
-      }
-    }
-
-    .storage-card__delete {
-      color: vars.$color-danger;
-
-      &:hover {
-        background: #fff4f2;
-      }
-    }
+  &__preview {
+    margin: v.$spacing-sm 0 0;
+    color: v.$color-text-muted;
+    font-size: v.$font-size-sm;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 38px;
   }
-
-  &__body {
-    margin-top: vars.$spacing-lg;
-  }
-
-  &__type {
-    font-size: vars.$font-size-xs;
+  &__alert {
+    display: inline-block;
+    margin-top: v.$spacing-sm;
+    color: v.$color-warning;
+    font-size: v.$font-size-xs;
     font-weight: 600;
   }
-
-  h2 {
-    margin-top: vars.$spacing-xs;
-    color: vars.$color-text;
-    font-size: vars.$font-size-lg;
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: v.$spacing-sm;
+    flex-wrap: wrap;
+    align-items: center;
+    border-top: 1px solid rgba(v.$color-text, 0.08);
+    padding: v.$spacing-sm v.$spacing-md;
+    font-size: v.$font-size-sm;
+    > a {
+      color: v.$color-primary;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    div {
+      display: flex;
+      gap: v.$spacing-sm;
+    }
+    button {
+      border: 0;
+      background: transparent;
+      padding: v.$spacing-sm 0;
+      color: v.$color-text-muted;
+      cursor: pointer;
+      font-size: v.$font-size-xs;
+      &:hover {
+        color: v.$color-text;
+        text-decoration: underline;
+      }
+    }
   }
 }

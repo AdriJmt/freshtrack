@@ -1,59 +1,118 @@
 <div class="register-form">
-    <app-brand-logo class="register-form__mobile-brand" />
-
-    <div class="register-form__heading">
-        <span class="register-form__eyebrow">CRÉER UN COMPTE</span>
-
-        <h2>Rejoignez FreshTrack.</h2>
-
-        <p>
-            Créez votre espace pour suivre vos aliments et réduire le gaspillage.
-        </p>
-    </div>
-
-    <form #registerForm="ngForm" (ngSubmit)="onSubmit()">
-        <div class="register-form__field">
-            <label for="register-email">Adresse e-mail</label>
-
-            <input id="register-email" type="email" name="email" [(ngModel)]="email" placeholder="vous@exemple.fr"
-                autocomplete="email" required email />
-        </div>
-
-        <div class="register-form__field">
-            <label for="register-password">Mot de passe</label>
-
-            <app-password-field name="password" [(ngModel)]="password" autocomplete="new-password"
-                placeholder="Choisissez un mot de passe" required />
-
-            <span class="register-form__hint">
-                Choisissez un mot de passe suffisamment robuste.
-            </span>
-        </div>
-
-        <div class="register-form__field">
-            <label for="register-confirm-password">
-                Confirmer le mot de passe
-            </label>
-
-            <app-password-field name="confirmPassword" [(ngModel)]="confirmPassword" autocomplete="new-password"
-                placeholder="Saisissez à nouveau le mot de passe" required />
-        </div>
-
-        @if (errorMessage) {
-        <p class="register-form__message register-form__message--error" role="alert">
-            {{ errorMessage }}
-        </p>
-        }
-
-
-        <button class="button button--primary" type="submit"
-            [disabled]="registerForm.invalid || isSubmitting || password !== confirmPassword">
-            {{ isSubmitting ? 'Création du compte…' : 'Créer mon compte' }}
-        </button>
-    </form>
-
-    <p class="register-form__login">
-        Vous avez déjà un compte ?
-        <a routerLink="/connexion">Se connecter</a>
+  <app-brand-logo class="register-form__mobile-brand" />
+  <div class="register-form__heading">
+    <h2>Moins d’oubli.<br />Plus de bons repas.</h2>
+    <p>
+      Créez votre compte pour retrouver vos réserves et garder un œil sur leurs
+      dates.
     </p>
+  </div>
+  <ol class="register-form__steps" aria-label="Étapes de création du compte">
+    <li aria-current="step"><span>1</span> Votre compte</li>
+    <li><span>2</span> Vérification e-mail</li>
+  </ol>
+  <form #form="ngForm" (ngSubmit)="onSubmit()">
+    <fieldset [disabled]="isSubmitting">
+      <div class="register-form__field">
+        <label for="register-name"
+          >Comment vous appeler ? <small>Facultatif</small></label
+        ><input
+          id="register-name"
+          name="displayName"
+          [(ngModel)]="displayName"
+          maxlength="100"
+          autocomplete="nickname"
+          placeholder="Votre prénom ou pseudo"
+        />
+      </div>
+      <div class="register-form__field">
+        <label for="register-email">Adresse e-mail</label
+        ><input
+          id="register-email"
+          type="email"
+          name="email"
+          #emailField="ngModel"
+          [(ngModel)]="email"
+          placeholder="vous@exemple.fr"
+          autocomplete="email"
+          maxlength="255"
+          required
+          email
+          [attr.aria-invalid]="emailField.invalid && emailField.touched"
+          aria-describedby="register-email-help"
+        />
+        <small
+          id="register-email-help"
+          [class.register-form__error]="
+            emailField.invalid && emailField.touched
+          "
+          >{{
+            emailField.invalid && emailField.touched
+              ? 'Saisissez une adresse e-mail valide.'
+              : 'Un code de confirmation sera envoyé à cette adresse.'
+          }}</small
+        >
+      </div>
+      <div class="register-form__field">
+        <label for="register-password">Mot de passe</label
+        ><app-password-field
+          controlId="register-password"
+          name="password"
+          [(ngModel)]="password"
+          autocomplete="new-password"
+          placeholder="Au moins 8 caractères"
+          [disabled]="isSubmitting"
+          required
+        />
+        <small
+          [class.register-form__error]="
+            password.length > 0 && !validPassword(password)
+          "
+          >{{
+            validPassword(password)
+              ? '✓ Longueur du mot de passe valide'
+              : 'Entre 8 et 72 caractères. Utilisez un mot de passe unique.'
+          }}</small
+        >
+      </div>
+      <div class="register-form__field">
+        <label for="register-confirm-password">Confirmer le mot de passe</label
+        ><app-password-field
+          controlId="register-confirm-password"
+          label="Confirmer le mot de passe"
+          name="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          autocomplete="new-password"
+          placeholder="Saisissez-le une seconde fois"
+          [disabled]="isSubmitting"
+          required
+        />
+        @if (confirmPassword) {
+          <small [class.register-form__error]="password !== confirmPassword">{{
+            password === confirmPassword
+              ? '✓ Les mots de passe correspondent'
+              : 'Les mots de passe ne correspondent pas encore.'
+          }}</small>
+        }
+      </div>
+    </fieldset>
+    @if (errorMessage) {
+      <p class="register-form__error" role="alert">{{ errorMessage }}</p>
+    }
+    <button
+      class="button button--primary"
+      type="submit"
+      [disabled]="
+        form.invalid ||
+        isSubmitting ||
+        !validPassword(password) ||
+        password !== confirmPassword
+      "
+    >
+      {{ isSubmitting ? 'Création du compte…' : 'Créer mon compte →' }}
+    </button>
+  </form>
+  <p class="register-form__login">
+    Déjà un compte ? <a routerLink="/connexion">Se connecter</a>
+  </p>
 </div>

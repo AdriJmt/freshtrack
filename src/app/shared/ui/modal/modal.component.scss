@@ -1,0 +1,70 @@
+@use 'styles/abstracts/variables' as v;
+.modal {
+  width: min(540px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-lg;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-sm;
+  line-height: 1.5;
+  color: v.$color-text;
+  background: v.$color-surface;
+  box-shadow: 0 24px 80px rgba(v.$color-text, 0.2);
+  overflow: auto;
+  &--wide {
+    width: min(760px, calc(100vw - 32px));
+  }
+  &::backdrop {
+    background: rgba(v.$color-text, 0.5);
+    backdrop-filter: blur(3px);
+  }
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: v.$spacing-md;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: v.$spacing-md;
+    border-bottom: 1px solid v.$color-border;
+    background: v.$color-surface;
+    h2 {
+      margin: 0;
+      font-size: v.$font-size-md;
+      letter-spacing: -0.4px;
+    }
+    p {
+      margin: v.$spacing-sm 0 0;
+      color: v.$color-text-muted;
+      font-size: v.$font-size-sm;
+      line-height: 1.5;
+    }
+    button {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border: 1px solid v.$color-border;
+      border-radius: 50%;
+      background: v.$color-surface;
+      color: v.$color-text;
+      font-size: v.$font-size-xl;
+      cursor: pointer;
+    }
+  }
+  &__body {
+    padding: v.$spacing-md;
+  }
+  button:focus-visible {
+    outline: 3px solid v.$color-primary-light;
+    outline-offset: 3px;
+  }
+}
+@media (max-width: v.$breakpoint-mobile) {
+  .modal__header,
+  .modal__body {
+    padding: v.$spacing-md;
+  }
+}

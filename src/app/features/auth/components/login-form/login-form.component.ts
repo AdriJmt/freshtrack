@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthError } from '@supabase/supabase-js';
 
 import { AuthService } from '../../../../core/auth.service';
@@ -23,7 +23,12 @@ export class LoginFormComponent {
   constructor(
     private readonly authService: AuthService,
     private readonly router: Router,
-  ) {}
+    private readonly route: ActivatedRoute,
+  ) {
+    if (this.route.snapshot.queryParamMap.get('passwordUpdated'))
+      this.successMessage =
+        'Votre mot de passe a été modifié. Connectez-vous avec le nouveau.';
+  }
 
   async onSubmit(): Promise<void> {
     if (this.isSubmitting) {
@@ -36,7 +41,12 @@ export class LoginFormComponent {
 
     try {
       await this.authService.login(this.email, this.password);
-      await this.router.navigate(['/']);
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      await this.router.navigateByUrl(
+        returnUrl?.startsWith('/') && !returnUrl.startsWith('//')
+          ? returnUrl
+          : '/',
+      );
     } catch (error: unknown) {
       if (error instanceof AuthError && error.code === 'invalid_credentials') {
         this.errorMessage = 'Vérifiez vos identifiants et réessayez.';

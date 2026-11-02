@@ -1,0 +1,25 @@
+@use "../abstracts/variables" as v;
+
+// Projected form controls share the dialog's typography, regardless of their feature.
+.modal .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: v.$spacing-sm;
+  margin: v.$spacing-md calc(-1 * v.$spacing-md) calc(-1 * v.$spacing-md);
+  padding: v.$spacing-md;
+  border-top: 1px solid v.$color-border;
+  background: v.$color-surface;
+}
+.modal .modal-footer button,
+.modal .modal-footer .button {
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  line-height: 1.25;
+  min-height: v.$button-height-sm;
+  height: auto;
+  padding: v.$spacing-sm v.$spacing-md;
+  border-radius: v.$radius-sm;
+}

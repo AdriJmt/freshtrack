@@ -1,3 +1,4 @@
+import { provideAppTesting } from '../../../../../testing/test-providers';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DashboardNavbarComponent } from './dashboard-navbar.component';
@@ -8,6 +9,7 @@ describe('DashboardNavbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: provideAppTesting(),
       imports: [DashboardNavbarComponent]
     })
     .compileComponents();

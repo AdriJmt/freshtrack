@@ -1,0 +1,25 @@
+<section class="session-state" [class.session-state--expired]="kind() === 'expired'" [class.session-state--error]="kind() === 'error'" [attr.role]="kind() === 'error' ? 'alert' : 'status'" aria-live="polite">
+  <span class="session-state__brand">FreshTrack · Ajout par scan</span>
+  <div class="session-state__icon" aria-hidden="true">
+    <svg viewBox="0 0 32 32" fill="none">
+      @if (kind() === 'expired') { <circle cx="16" cy="16" r="11" /><path d="M16 9v8l5 3" /> }
+      @else if (kind() === 'finished') { <circle cx="16" cy="16" r="11" /><path d="m10 16 4 4 8-9" /> }
+      @else { <circle cx="16" cy="16" r="11" /><path d="M16 9v9m0 4v1" /> }
+    </svg>
+  </div>
+  @if (kind() === 'expired') {
+    <h1>Cette session est terminée</h1>
+    <p>Le QR code a expiré ou la fenêtre de scan a été fermée sur l’ordinateur.</p>
+    <div class="session-state__instruction"><strong>Pour continuer votre ajout</strong><p>Générez un nouveau QR code depuis l’ordinateur, puis scannez-le avec votre téléphone.</p></div>
+    <p class="session-state__hint">Les produits déjà validés restent dans vos stockages. Vous pouvez fermer cet onglet.</p>
+  } @else if (kind() === 'finished') {
+    <h1>Scan terminé</h1>
+    <p>Les produits que vous avez validés sont disponibles dans vos stockages.</p>
+    <div class="session-state__instruction"><strong>Tout est prêt</strong><p>Retrouvez votre inventaire sur l’ordinateur.</p></div>
+    <p class="session-state__hint">Vous pouvez maintenant fermer cet onglet.</p>
+  } @else {
+    <h1>Connexion interrompue</h1>
+    <p class="session-state__error">{{ description() || 'Impossible de préparer le scan. Vérifiez votre connexion et réessayez.' }}</p>
+    <button class="button button--primary" type="button" (click)="retry.emit()">Réessayer</button>
+  }
+</section>

@@ -1,0 +1,4 @@
+@use "styles/abstracts/variables" as v;
+p { line-height: 1.6; } label { display: block; font-weight: 600; margin-bottom: v.$spacing-sm; }
+.quantity { display: flex; flex-wrap: wrap; gap: v.$spacing-sm; align-items: center; input { width: 80px; min-height: v.$input-height-sm; border: 1px solid v.$color-border; border-radius: v.$radius-sm; padding: v.$spacing-sm; font: inherit; } span { color: v.$color-text-muted; } button { border: 0; color: v.$color-primary; background: transparent; font: inherit; cursor: pointer; text-decoration: underline; } }
+.error { color: v.$color-danger; }

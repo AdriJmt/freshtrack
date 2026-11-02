@@ -1,25 +1,26 @@
-<section class="storage-widget">
-    <div class="storage-widget__heading">
-        <div>
-            <h2>Mes stockages</h2>
-            <p>Organisez vos aliments par emplacement.</p>
-        </div>
+<section>
+  <div class="workspace__section">
+    <div>
+      <h2>Vos stockages</h2>
+      <p>Ouvrez un espace pour voir son contenu.</p>
     </div>
-
-    <div class="storage-widget__actions">
-        <button type="button" class="storage-widget__add">
-            <span aria-hidden="true">+</span>
-            Ajouter un frigo
-        </button>
-
-        <button type="button" class="storage-widget__add">
-            <span aria-hidden="true">+</span>
-            Ajouter un placard
-        </button>
-    </div>
-
-    <div class="storage-widget__empty">
-        <h3>Aucun stockage pour le moment</h3>
-        <p>Ajoutez votre premier frigo ou placard pour commencer.</p>
-    </div>
+    <a routerLink="/stockages">Tout voir →</a>
+  </div>
+  <div class="storage-list">
+    @for (storage of storages(); track storage.id) {
+      <app-storage-card
+        [storage]="storage"
+        [summary]="summaries().get(storage.id!)"
+        (edit)="editStorage.emit($event)"
+        (delete)="deleteStorage.emit($event)"
+      />
+    }
+    <button
+      class="storage-add"
+      type="button"
+      (click)="addStorage.emit('FRIDGE')"
+    >
+      ＋ Créer un stockage
+    </button>
+  </div>
 </section>

@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.spec.json",
+  "include": [
+    "src/app/features/inventory/**/*.spec.ts",
+    "src/app/shared/ui/select/**/*.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

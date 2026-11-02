@@ -1,172 +1,122 @@
-@use "styles/abstracts/variables" as vars;
-
+@use 'styles/abstracts/variables' as v;
+:host {
+  display: block;
+  min-width: 0;
+  height: 100%;
+}
 .product-card {
-  position: relative;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: vars.$spacing-lg;
-  min-height: 180px;
-  padding: vars.$spacing-lg;
-  border: 1px solid vars.$color-border;
-  border-radius: vars.$radius-lg;
-  background: vars.$color-surface;
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease;
-
+  gap: v.$spacing-md;
+  padding: v.$spacing-md;
+  background: v.$color-surface;
+  border: 1px solid v.$color-border;
+  border-radius: v.$radius-md;
+  transition: box-shadow 0.15s;
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgb(0 0 0 / 5%);
+    box-shadow: 0 6px 20px rgba(v.$color-text, 0.06);
   }
-
-  &__header {
+  &__main {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: vars.$spacing-md;
+    align-items: center;
+    gap: v.$spacing-md;
+    min-height: 86px;
   }
-
   &__identity {
+    flex: 1;
     min-width: 0;
-
-    h2 {
-      overflow-wrap: anywhere;
-      color: vars.$color-text;
-      font-size: vars.$font-size-lg;
+    h3 {
+      margin: v.$spacing-xs 0 v.$spacing-sm;
+      font-size: v.$font-size-base;
+      font-weight: 650;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-  }
-
-  &__storage {
-    display: inline-block;
-    margin-top: vars.$spacing-xs;
-    color: vars.$color-text-muted;
-    font-size: vars.$font-size-xs;
-  }
-
-  &__menu {
-    position: relative;
-  }
-
-  &__menu-trigger {
-    display: grid;
-    width: 34px;
-    height: 34px;
-    place-items: center;
-    border: none;
-    border-radius: vars.$radius-sm;
-    background: transparent;
-    color: vars.$color-text-muted;
-    font-size: 17px;
-    letter-spacing: 1px;
-    cursor: pointer;
-
-    &:hover {
-      background: vars.$color-background;
-      color: vars.$color-text;
-    }
-  }
-
-  &__popover {
-    position: absolute;
-    z-index: 10;
-    top: calc(100% + 6px);
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    width: 160px;
-    padding: vars.$spacing-xs;
-    border: 1px solid vars.$color-border;
-    border-radius: vars.$radius-md;
-    background: vars.$color-surface;
-    box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
-
-    button {
-      padding: 10px vars.$spacing-sm;
-      border: none;
-      border-radius: vars.$radius-sm;
-      background: transparent;
-      color: vars.$color-text;
-      font-family: vars.$font-family-base;
-      font-size: vars.$font-size-sm;
-      text-align: left;
-      cursor: pointer;
-
+    a {
+      font-size: v.$font-size-sm;
+      color: v.$color-text-muted;
+      text-decoration: none;
       &:hover {
-        background: vars.$color-background;
-      }
-    }
-
-    .product-card__delete {
-      color: vars.$color-danger;
-
-      &:hover {
-        background: #fff4f2;
+        color: v.$color-primary;
+        text-decoration: underline;
       }
     }
   }
-
-  &__details {
+  &__quantity {
+    font-size: v.$font-size-xs;
+    color: v.$color-text-muted;
+  }
+  &__date {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: vars.$spacing-sm;
-  }
-
-  &__label {
-    display: block;
-    margin-bottom: vars.$spacing-xs;
-    color: vars.$color-text-muted;
-    font-size: vars.$font-size-xs;
-  }
-
-  &__expiry-value {
-    display: flex;
     align-items: center;
-    gap: vars.$spacing-sm;
-    color: vars.$color-text;
-    font-size: vars.$font-size-sm;
-    font-weight: 600;
-  }
-
-  &__status {
-    width: 8px;
-    height: 8px;
-    flex-shrink: 0;
-    border-radius: 50%;
-
-    &--expired {
-      background: vars.$color-danger;
-    }
-
-    &--soon {
-      background: vars.$color-warning;
-    }
-
-    &--normal {
-      background: vars.$color-primary;
+    flex-wrap: wrap;
+    gap: v.$spacing-sm;
+    margin-top: auto;
+    padding: v.$spacing-sm v.$spacing-md;
+    background: v.$color-primary-light;
+    border-radius: v.$radius-sm;
+    color: v.$color-primary;
+    font-size: v.$font-size-sm;
+    strong {
+      font-weight: 600;
     }
   }
-
-  &__type {
-    padding: vars.$spacing-xs vars.$spacing-sm;
-    border-radius: vars.$radius-sm;
-    font-size: vars.$font-size-xs;
-    font-weight: 600;
-
-    &--dlc {
-      background: #fff0ed;
-      color: #a33b2e;
-    }
-
-    &--ddm {
-      background: vars.$color-storage-fridge;
-      color: vars.$color-storage-fridge-text;
+  &--soon &__date {
+    background: v.$color-warning-background;
+    color: v.$color-warning;
+  }
+  &--unknown &__date {
+    background: v.$color-background;
+    color: v.$color-text-muted;
+  }
+  &--expired &__date {
+    background: rgba(v.$color-danger, 0.07);
+    color: v.$color-danger;
+  }
+  footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: v.$spacing-sm;
+    padding-top: v.$spacing-sm;
+    border-top: 1px solid v.$color-border;
+    font-size: v.$font-size-xs;
+    color: v.$color-text-muted;
+    a {
+      color: v.$color-primary;
     }
   }
-
-  &__barcode,
-  &__package {
-    color: vars.$color-text-muted;
-    font-size: vars.$font-size-xs;
+  &__barcode {
+    font-variant-numeric: tabular-nums;
+  }
+  &__actions {
+    display: flex;
+    gap: v.$spacing-sm;
+    button {
+      border: 0;
+      background: transparent;
+      padding: v.$spacing-sm 0;
+      font-size: v.$font-size-sm;
+      color: v.$color-primary;
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    .product-card__delete {
+      color: v.$color-text-muted;
+      &:hover {
+        color: v.$color-danger;
+      }
+    }
   }
 }
+
+.product-card--consumed .product-card__date { color: v.$color-text-muted; background: v.$color-background; }
+.product-card .product-card__actions .product-card__consume { color: v.$color-primary; font-weight: 600; }

@@ -1,0 +1,12 @@
+<div class="skeleton-grid" [class.skeleton-grid--stats]="variant() === 'stats'" [class.skeleton-grid--account]="variant() === 'account'" [class.skeleton-grid--single]="columns() === 'single'" role="status" [attr.aria-label]="label()" aria-busy="true">
+  @for (item of items(); track item) {
+    <div class="skeleton-card" [class.skeleton-card--storage]="variant() === 'storages'" [class.skeleton-card--account]="variant() === 'account'" [class.skeleton-card--stats]="variant() === 'stats'" aria-hidden="true">
+      @switch (variant()) {
+        @case ('stats') { <i class="block line"></i><i class="block number"></i><i class="block line"></i> }
+        @case ('account') { <i class="block title"></i><i class="block line"></i><i class="block field"></i><i class="block line"></i><i class="block field"></i><i class="block field"></i><i class="block button"></i> }
+        @case ('storages') { <div class="skeleton-top"><i class="block icon"></i><div><i class="block line"></i><i class="block title"></i></div></div><i class="block number"></i><i class="block line"></i><i class="block line"></i><div class="skeleton-footer"><i class="block button"></i><i class="block button"></i></div> }
+        @default { <div class="skeleton-top"><i class="block image"></i><div><i class="block short"></i><i class="block title"></i><i class="block line"></i></div></div><i class="block date"></i><div class="skeleton-footer"><i class="block short"></i><i class="block button"></i></div> }
+      }
+    </div>
+  }
+</div>
